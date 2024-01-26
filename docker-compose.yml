@@ -1,0 +1,67 @@
+services:
+  postgres1:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    networks:
+      - yb-net
+    environment:
+      POSTGRES_DB: your_postgres_db1
+      POSTGRES_USER: your_postgres_user1
+      POSTGRES_PASSWORD: your_postgres_password1
+
+  postgres2:
+    image: postgres:latest
+    ports:
+      - "5433:5432"
+    networks:
+      - yb-net
+    environment:
+      POSTGRES_DB: your_postgres_db2
+      POSTGRES_USER: your_postgres_user2
+      POSTGRES_PASSWORD: your_postgres_password2
+
+  postgres3:
+    image: postgres:latest
+    ports:
+      - "5434:5432"
+    networks:
+      - yb-net
+    environment:
+      POSTGRES_DB: your_postgres_db3
+      POSTGRES_USER: your_postgres_user3
+      POSTGRES_PASSWORD: your_postgres_password3
+
+  yugabyte1:
+    image: yugabytedb/yugabyte:latest
+    ports:
+      - "7100:7000"
+      - "9100:9000"
+    networks:
+      - yb-net
+    environment:
+      - YB_PG_SERVER_ARGS=--postgres_host=postgres1
+
+  yugabyte2:
+    image: yugabytedb/yugabyte:latest
+    ports:
+      - "7200:7000"
+      - "9200:9000"
+    networks:
+      - yb-net
+    environment:
+      - YB_PG_SERVER_ARGS=--postgres_host=postgres2
+
+  yugabyte3:
+    image: yugabytedb/yugabyte:latest
+    ports:
+      - "7300:7000"
+      - "9300:9000"
+    networks:
+      - yb-net
+    environment:
+      - YB_PG_SERVER_ARGS=--postgres_host=postgres3
+
+networks:
+  yb-net:
+    driver: bridge

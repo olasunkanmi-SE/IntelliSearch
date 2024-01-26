@@ -1,67 +1,52 @@
+version: "3"
+
 services:
-  postgres1:
-    image: postgres:latest
-    ports:
-      - "5432:5432"
+  yugabytedb-node1:
+    image: yugabytedb/yugabyte:2.19.3.0-b140
+    container_name: yugabytedb-node1
     networks:
-      - yb-net
-    environment:
-      POSTGRES_DB: your_postgres_db1
-      POSTGRES_USER: your_postgres_user1
-      POSTGRES_PASSWORD: your_postgres_password1
+      - custom-network
+    ports:
+      - "15433:15433"
+      - "7001:7000"
+      - "9001:9000"
+      - "5433:5433"
+    volumes:
+      - ~/yugabyte_volume/node1:/home/yugabyte/yb_data
+    restart: unless-stopped
+    command: ["bin/yugabyted", "start", "--base_dir=/home/yugabyte/yb_data", "--daemon=false"]
 
-  postgres2:
-    image: postgres:latest
-    ports:
-      - "5433:5432"
+  yugabytedb-node2:
+    image: yugabytedb/yugabyte:2.19.3.0-b140
+    container_name: yugabytedb-node2
     networks:
-      - yb-net
-    environment:
-      POSTGRES_DB: your_postgres_db2
-      POSTGRES_USER: your_postgres_user2
-      POSTGRES_PASSWORD: your_postgres_password2
+      - custom-network
+    ports:
+      - "15434:15433"
+      - "7002:7000"
+      - "9002:9000"
+      - "5434:5433"
+    volumes:
+      - ~/yugabyte_volume/node2:/home/yugabyte/yb_data
+    restart: unless-stopped
+    command:
+      ["bin/yugabyted", "start", "--join=yugabytedb-node1", "--base_dir=/home/yugabyte/yb_data", "--daemon=false"]
 
-  postgres3:
-    image: postgres:latest
-    ports:
-      - "5434:5432"
+  yugabytedb-node3:
+    image: yugabytedb/yugabyte:2.19.3.0-b140
+    container_name: yugabytedb-node3
     networks:
-      - yb-net
-    environment:
-      POSTGRES_DB: your_postgres_db3
-      POSTGRES_USER: your_postgres_user3
-      POSTGRES_PASSWORD: your_postgres_password3
-
-  yugabyte1:
-    image: yugabytedb/yugabyte:latest
+      - custom-network
     ports:
-      - "7100:7000"
-      - "9100:9000"
-    networks:
-      - yb-net
-    environment:
-      - YB_PG_SERVER_ARGS=--postgres_host=postgres1
-
-  yugabyte2:
-    image: yugabytedb/yugabyte:latest
-    ports:
-      - "7200:7000"
-      - "9200:9000"
-    networks:
-      - yb-net
-    environment:
-      - YB_PG_SERVER_ARGS=--postgres_host=postgres2
-
-  yugabyte3:
-    image: yugabytedb/yugabyte:latest
-    ports:
-      - "7300:7000"
-      - "9300:9000"
-    networks:
-      - yb-net
-    environment:
-      - YB_PG_SERVER_ARGS=--postgres_host=postgres3
+      - "15435:15433"
+      - "7003:7000"
+      - "9003:9000"
+      - "5435:5433"
+    volumes:
+      - ~/yugabyte_volume/node3:/home/yugabyte/yb_data
+    restart: unless-stopped
+    command:
+      ["bin/yugabyted", "start", "--join=yugabytedb-node2", "--base_dir=/home/yugabyte/yb_data", "--daemon=false"]
 
 networks:
-  yb-net:
-    driver: bridge
+  custom-network:

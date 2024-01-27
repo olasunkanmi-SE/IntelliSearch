@@ -1,11 +1,9 @@
 const express = require("express");
-const { Client } = require("pg");
-const { dbConfig } = require("../dbConfig");
+const database = require("./database");
 
 const app = express();
 
-const client = new Client(dbConfig);
-client
+database
   .connect()
   .then(() => {
     console.log("Connected to database.");

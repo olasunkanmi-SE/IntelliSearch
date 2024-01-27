@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  postgres:
+    image: ankane/pgvector
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres1
+      POSTGRES_DB: embedding
+    volumes:
+      - ./api/pgdata:/postgres/data
+    ports:
+      - 35000:5432

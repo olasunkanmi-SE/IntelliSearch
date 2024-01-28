@@ -1,6 +1,6 @@
 export const dbQuery = {
   CREATE_VECTOR: "CREATE EXTENSION IF NOT EXISTS vector;",
-  CREATE_TABLE: `
+  CREATE_DOCUMENT_TABLE: `
     CREATE TABLE IF NOT EXISTS documents (
       id bigserial PRIMARY KEY,
       content text,
@@ -32,4 +32,9 @@ export const dbQuery = {
   `,
   CREATE_INDEX: `CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops)
           WITH (lists = 100);`,
+  INSERT_INTO_DOCUMENT_TABLE: (content: string, embedding: any) => `
+      INSERT INTO documents (${content}, ${embedding})
+      VALUES ($1, $2)
+      RETURNING id;
+    `,
 };

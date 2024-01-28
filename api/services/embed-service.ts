@@ -1,5 +1,20 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export class EmbeddingService {
-  generateEmbeddings() {}
+  genAI: GoogleGenerativeAI;
+  constructor(private readonly apiKey: string, private readonly AIModel: string) {
+    this.genAI = new GoogleGenerativeAI(this.apiKey);
+  }
+  /**
+   * Generates embeddings for the given text using the generative model.
+   * @returns The embedding generated for the text.
+   */
+  async generateEmbeddings(text: string) {
+    const model = this.genAI.getGenerativeModel({ model: this.AIModel });
+    const result = await model.embedContent(text);
+    const embedding = result.embedding;
+    return embedding;
+  }
 
   /**
    * Calculates the cosine similarity between two vectors.

@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+import { Client } from "pg";
 
 const dbConfig = {
   host: "localhost",
@@ -8,7 +8,8 @@ const dbConfig = {
   password: "postgres1",
 };
 
-class DataBase {
+export class DataBase {
+  client: Client;
   constructor() {
     this.client = new Client(dbConfig);
     this.client.query("CREATE EXTENSION IF NOT EXISTS vector;");
@@ -18,6 +19,3 @@ class DataBase {
     return this.client.connect();
   }
 }
-
-const database = new DataBase();
-module.exports = database;

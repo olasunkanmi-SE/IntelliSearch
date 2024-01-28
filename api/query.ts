@@ -7,34 +7,20 @@ export const dbQuery = {
       embedding vector(1536)
     );
   `,
-  CREATE_MATCH_DOCUMENTS_TABLES: `
-    create or replace function match_documents (
-      query_embedding vector(1536),
-      match_threshold float,
-      match_count int
-    )
-    returns table (
-      id bigint,
-      content text,
-      similarity float
-    )
-    language sql stable
-    as $$
-      select
-        documents.id,
-        documents.content,
-        1 - (documents.embedding <=> query_embedding) as similarity
-      from documents
-      where documents.embedding <=> query_embedding < 1 - match_threshold
-      order by documents.embedding <=> query_embedding
-      limit match_count;
-    $$;
+  SIMILARITY_SEARCH: `
+    SELECT
+      documents.id,
+      documents.content,
+      1 - (documents.embedding <=> $1) AS similarity
+    FROM documents
+    WHERE documents.embedding <=> $1 < 1 - $2
+    ORDER BY documents.embedding <=> $1
+    LIMIT match_count;
   `,
   CREATE_INDEX: `CREATE INDEX ON documents USING ivfflat (embedding vector_cosine_ops)
-          WITH (lists = 100);`,
-  INSERT_INTO_DOCUMENT_TABLE: (content: string, embedding: any) => `
-      INSERT INTO documents (${content}, ${embedding})
-      VALUES ($1, $2)
-      RETURNING id;
-    `,
+    WITH (lists = 100);`,
+  INSERT_INTO_DOCUMENT_TABLE: `
+    INSERT INTO documents (content, embedding)
+    VALUES ($1, $2)
+  `,
 };

@@ -1,6 +1,7 @@
 import { DataBase } from "./database";
 import express, { Express } from "express";
 import "dotenv/config";
+import { DocumentService } from "./services/document-service";
 
 const app: Express = express();
 

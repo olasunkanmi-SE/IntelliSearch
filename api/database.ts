@@ -1,7 +1,7 @@
-import { Client, ClientConfig } from "pg";
-import { config } from "./db-config";
+import { Client } from "pg";
+import { config } from "./core/db-config";
 import { dbQuery } from "./query";
-import { AppError } from "./error";
+import { AppError } from "./core/error";
 
 export class DataBase {
   client: Client;
@@ -20,7 +20,7 @@ export class DataBase {
   }
 
   async createDocumentsTable() {
-    const createDocument = dbQuery.CREATE_TABLE;
+    const createDocument = dbQuery.CREATE_DOCUMENT_TABLE;
     try {
       await this.client.query(createDocument);
     } catch (error) {
@@ -42,6 +42,18 @@ export class DataBase {
       console.log("Disconnected from the database.");
     } catch (err) {
       console.error(AppError.dbDisconnectError, err);
+    }
+  }
+
+  async CreateDocument(content: string, embedding: any): Promise<boolean> {
+    const query = dbQuery.INSERT_INTO_DOCUMENT_TABLE(content, embedding);
+    try {
+      const result = await this.client.query(query);
+      if (result.rowCount > 0) {
+        return true;
+      }
+    } catch (error) {
+      console.error("Error inserting document into DB", error);
     }
   }
 }

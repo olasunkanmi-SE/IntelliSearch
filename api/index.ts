@@ -1,8 +1,9 @@
-const express = require("express");
-const database = require("./database");
+import express from "express";
+import { DataBase } from "./database";
 
 const app = express();
 
+const database = new DataBase();
 database
   .connect()
   .then(() => {

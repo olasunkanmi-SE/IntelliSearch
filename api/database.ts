@@ -35,4 +35,13 @@ export class DataBase {
       console.error(AppError.dbConnectionError, error);
     }
   }
+
+  async disconnect() {
+    try {
+      await this.client.end();
+      console.log("Disconnected from the database.");
+    } catch (err) {
+      console.error(AppError.dbDisconnectError, err);
+    }
+  }
 }

@@ -20,4 +20,5 @@ jobs:
         working-directory: ./api
         run: |
           npm i
+          npm i typescript
           npm run build

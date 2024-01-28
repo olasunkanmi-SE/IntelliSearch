@@ -1,9 +1,10 @@
-import express from "express";
 import { DataBase } from "./database";
+import express, { Express } from "express";
+import "dotenv/config";
 
-const app = express();
+const app: Express = express();
 
-const database = new DataBase();
+const database: DataBase = new DataBase();
 database
   .connect()
   .then(() => {
@@ -13,7 +14,7 @@ database
     console.error("Error connecting to the database:", err);
   });
 
-const port = process.env.PORT || 3000;
+const port: number = Number(process.env.PORT) || 3000;
 app.listen(port, () => {
-  console.log("Server listening on port 3000.");
+  console.log(`Server listening on port ${port}.`);
 });

@@ -45,7 +45,7 @@ export class DataBase {
     }
   }
 
-  async CreateDocument(content: string, embedding: any): Promise<boolean> {
+  async createDocument(content: string, embedding: number[]): Promise<boolean> {
     const query = dbQuery.INSERT_INTO_DOCUMENT_TABLE;
     try {
       const result = await this.client.query(query, [content, embedding]);

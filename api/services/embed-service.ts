@@ -9,11 +9,11 @@ export class EmbeddingService {
    * Generates embeddings for the given text using the generative model.
    * @returns The embedding generated for the text.
    */
-  async generateEmbeddings(text: string) {
+  async generateEmbeddings(text: string): Promise<number[]> {
     const model = this.genAI.getGenerativeModel({ model: this.AIModel });
     const result = await model.embedContent(text);
     const embedding = result.embedding;
-    return embedding;
+    return embedding.values;
   }
 
   /**
@@ -23,7 +23,7 @@ export class EmbeddingService {
    * @returns The cosine similarity between the two vectors.
    * @throws Error if the lengths of the vectors are not equal.
    */
-  cosineSimilarity(vecA: number[], vecB: number[]) {
+  cosineSimilarity(vecA: number[], vecB: number[]): number {
     let dotProduct = 0;
     let magnitudeA = 0;
     let magnitudeB = 0;

@@ -2,21 +2,29 @@ import { AppService } from "./services/app.service";
 import { DataBase } from "./database";
 import express, { Express } from "express";
 import "dotenv/config";
-import { getEnvValue } from "./utils";
+import { getValue } from "./utils";
 const app: Express = express();
 
-const database: DataBase = new DataBase();
-database
-  .connect()
-  .then(() => {
+export const database: DataBase = new DataBase();
+async function initializeDatabase() {
+  try {
+    await database.connect();
     console.log("Connected to database.");
-  })
-  .catch((err) => {
-    console.error("Error connecting to the database:", err);
-  });
 
-const filePath: string = getEnvValue("PDF_ABSOLUTE_PATH");
-const apiKey: string = getEnvValue("API_KEY");
+    await database.createVector();
+    console.log("Vector created.");
+
+    await database.createDocumentsTable();
+    console.log("Documents table created.");
+  } catch (err) {
+    console.error("Error connecting to the database:", err);
+  }
+}
+
+initializeDatabase();
+
+const filePath: string = getValue("PDF_ABSOLUTE_PATH");
+const apiKey: string = getValue("API_KEY");
 
 const createEmbedding = async () => {
   const appService = new AppService(apiKey, filePath);

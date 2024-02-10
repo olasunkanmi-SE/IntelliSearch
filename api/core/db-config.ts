@@ -1,12 +1,12 @@
 import { ClientConfig } from "pg";
-import { getEnvValue } from "../utils";
+import { getValue } from "../utils";
 
 export const config = (): ClientConfig => {
   return {
-    host: getEnvValue("HOST"),
-    port: Number(getEnvValue("PGPORT")),
-    database: getEnvValue("DATABASE_NAME"),
-    user: getEnvValue("DATABASE_USER"),
-    password: getEnvValue("DATABASE_PASSWORD"),
+    host: getValue("HOST"),
+    port: Number(getValue("PGPORT")),
+    database: getValue("DATABASE_NAME"),
+    user: getValue("DATABASE_USER"),
+    password: getValue("DATABASE_PASSWORD"),
   };
 };

@@ -1,1 +1,1 @@
-export const getEnvValue = (props: string) => process.env[props];
+export const getValue = (props: string) => process.env[props];

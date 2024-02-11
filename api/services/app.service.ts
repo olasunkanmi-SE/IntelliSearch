@@ -23,5 +23,7 @@ export class AppService extends EmbeddingService {
     }
   }
 
-  async similaritySearch() {}
+  async search(prompt: string) {
+    const embedding = this.generateEmbeddings(prompt);
+  }
 }

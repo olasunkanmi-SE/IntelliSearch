@@ -4,6 +4,7 @@ import express, { Express } from "express";
 import "dotenv/config";
 import { getValue } from "./utils";
 import { CONSTANTS } from "./core/constants";
+import { GenericSQLRepository } from "./repositories/generic-sql-repository";
 const app: Express = express();
 
 export const database: DataBase = new DataBase();
@@ -32,12 +33,11 @@ const filePath: string = getValue("PDF_ABSOLUTE_PATH");
 const apiKey: string = getValue("API_KEY");
 
 const createEmbedding = async () => {
-  const appService = new AppService(apiKey, filePath, CONSTANTS.generativeAIModel);
+  const appService = new AppService(apiKey, filePath, CONSTANTS.AIModels.embedding);
   return await appService.createEmbeddings();
 };
 
-createEmbedding();
-
+const repo = new GenericSQLRepository().createProductsAndReviews();
 const port: number = Number(process.env.PORT) || 3000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}.`);

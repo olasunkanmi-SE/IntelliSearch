@@ -3,6 +3,7 @@ import { DataBase } from "./database";
 import express, { Express } from "express";
 import "dotenv/config";
 import { getValue } from "./utils";
+import { CONSTANTS } from "./core/constants";
 const app: Express = express();
 
 export const database: DataBase = new DataBase();
@@ -31,7 +32,7 @@ const filePath: string = getValue("PDF_ABSOLUTE_PATH");
 const apiKey: string = getValue("API_KEY");
 
 const createEmbedding = async () => {
-  const appService = new AppService(apiKey, filePath);
+  const appService = new AppService(apiKey, filePath, CONSTANTS.generativeAIModel);
   return await appService.createEmbeddings();
 };
 

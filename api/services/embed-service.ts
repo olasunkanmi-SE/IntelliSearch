@@ -3,7 +3,7 @@ import { IEmbeddingService } from "../interfaces/embedding-service.interface";
 
 export class EmbeddingService implements IEmbeddingService {
   genAI: GoogleGenerativeAI;
-  constructor(private readonly apiKey: string, private readonly AIModel: string) {
+  constructor(protected readonly apiKey: string, protected readonly AIModel: string) {
     this.genAI = new GoogleGenerativeAI(this.apiKey);
   }
   /**

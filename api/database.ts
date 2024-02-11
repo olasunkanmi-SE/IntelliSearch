@@ -1,19 +1,19 @@
 import { Client } from "pg";
 import { config } from "./core/db-config";
 import { AppError } from "./core/error";
-import { EmbeddingRepository } from "./repositories/embedding-repository";
+import { GenericSQLRepository } from "./repositories/generic-sql-repository";
 
 export class DataBase {
   client: Client;
-  embeddingRepository: EmbeddingRepository;
+  genericRepository: GenericSQLRepository;
   constructor() {
     this.client = new Client(config());
-    this.embeddingRepository = new EmbeddingRepository();
+    this.genericRepository = new GenericSQLRepository();
   }
 
   async createVector() {
     try {
-      await this.embeddingRepository.createVectorExtension();
+      await this.genericRepository.createVectorExtension();
     } catch (error) {
       console.error(AppError.VectorCreationError, error);
     }
@@ -21,7 +21,7 @@ export class DataBase {
 
   async createEmbeddingIndex() {
     try {
-      await this.embeddingRepository.createIvfflatIndex();
+      await this.genericRepository.createIvfflatIndex();
     } catch (error) {
       console.error("An error occured while the ivfflat index", error);
     }
@@ -29,7 +29,7 @@ export class DataBase {
 
   async documentExists() {
     try {
-      return await this.embeddingRepository.checkDocumentsExists();
+      return await this.genericRepository.checkDocumentsExists();
     } catch (error) {
       console.error("An error occured while checking for documents", error);
     }
@@ -37,7 +37,7 @@ export class DataBase {
 
   async createDocumentsTable() {
     try {
-      await this.embeddingRepository.createDocumentTable();
+      await this.genericRepository.createDocumentTable();
     } catch (error) {
       console.error("An error occured while creating the document table", error);
     }
@@ -62,7 +62,7 @@ export class DataBase {
 
   async createDocument(content: string, embedding: number[]) {
     try {
-      await this.embeddingRepository.insertDocument(content, JSON.stringify(embedding));
+      await this.genericRepository.insertDocument(content, JSON.stringify(embedding));
     } catch (error) {
       console.log("an error occured while creating embeddings", error);
     }

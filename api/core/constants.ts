@@ -1,3 +1,6 @@
 export const CONSTANTS = {
-  generativeAIModel: "embedding-001",
+  AIModels: {
+    embedding: "embedding-001",
+    chat: "gemini-pro",
+  },
 };

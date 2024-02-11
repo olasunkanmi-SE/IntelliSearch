@@ -10,11 +10,15 @@ async function initializeDatabase() {
   try {
     await database.connect();
     console.log("Connected to database.");
+    const documentsExists = await database.documentExists();
+    if (documentsExists) {
+      await database.createEmbeddingIndex();
+    } else {
+      await database.createVector();
+      console.log("Vector created.");
 
-    await database.createVector();
-    console.log("Vector created.");
-
-    await database.createDocumentsTable();
+      await database.createDocumentsTable();
+    }
     console.log("Documents table created.");
   } catch (err) {
     console.error("Error connecting to the database:", err);

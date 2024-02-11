@@ -19,6 +19,22 @@ export class DataBase {
     }
   }
 
+  async createEmbeddingIndex() {
+    try {
+      await this.embeddingRepository.createIvfflatIndex();
+    } catch (error) {
+      console.error("An error occured while the ivfflat index", error);
+    }
+  }
+
+  async documentExists() {
+    try {
+      return await this.embeddingRepository.checkDocumentsExists();
+    } catch (error) {
+      console.error("An error occured while checking for documents", error);
+    }
+  }
+
   async createDocumentsTable() {
     try {
       await this.embeddingRepository.createDocumentTable();

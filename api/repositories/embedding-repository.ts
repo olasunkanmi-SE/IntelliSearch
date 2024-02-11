@@ -47,4 +47,30 @@ export class EmbeddingRepository {
       console.error("Error creating vector extension", error);
     }
   };
+
+  createIvfflatIndex = async () => {
+    try {
+      await database.client.query(`
+      CREATE INDEX IF NOT EXISTS items_embedding_ivfflat_index
+      ON documents
+      USING ivfflat (embedding vector_cosine_ops)
+      WITH (lists = 100);
+      `);
+    } catch (error) {
+      console.error("Error setting index on documents", error);
+    }
+  };
+
+  checkDocumentsExists = async (): Promise<boolean> => {
+    let exists = false;
+    try {
+      const result = await database.client.query(`SELECT * from documents LIMIT 1`);
+      if (result.rowCount > 0) {
+        exists = true;
+      }
+      return exists;
+    } catch (error) {
+      console.error("Error occured while query for documents", error);
+    }
+  };
 }

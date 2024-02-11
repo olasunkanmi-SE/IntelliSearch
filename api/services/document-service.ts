@@ -1,13 +1,16 @@
 import fs from "fs";
 import pdf from "pdf-parse";
+import { Utility } from "../utils/utils";
+import { IDocumentService } from "../interfaces/document-service.interface";
 
-export class DocumentService {
+export class DocumentService implements IDocumentService {
   async convertPDFToText(pdfFilePath: string): Promise<string> {
     try {
       const dataBuffer = fs.readFileSync(pdfFilePath);
       const data = await pdf(dataBuffer);
       const text = data.text;
-      return text.replace(/\n/g, "");
+      const formatedText = Utility.formatText(text);
+      return formatedText;
     } catch (error) {
       console.error("Error while converting pdf to text", error);
     }

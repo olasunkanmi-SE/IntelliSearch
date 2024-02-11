@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { IEmbeddingService } from "../interfaces/embedding-service.interface";
 
-export class EmbeddingService {
+export class EmbeddingService implements IEmbeddingService {
   genAI: GoogleGenerativeAI;
   constructor(private readonly apiKey: string, private readonly AIModel: string) {
     this.genAI = new GoogleGenerativeAI(this.apiKey);

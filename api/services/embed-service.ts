@@ -1,5 +1,6 @@
 import { GenerativeModel, GoogleGenerativeAI, TaskType } from "@google/generative-ai";
 import { IEmbeddingService } from "../interfaces/embedding-service.interface";
+import { GenerativeAIService } from "./ai.service";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
  * For a retrieval task, which is specified by setting `taskType` to `TaskType.RETRIEVAL_QUERY`, 
@@ -41,10 +42,10 @@ A typical use case for the `RETRIEVAL_DOCUMENT` task type is embedding documents
 of information. For example, you could use this task type to embed articles, FAQs, 
 or product manuals to create a searchable knowledge base for customer support or information retrieval systems.*/
 
-export class EmbeddingService implements IEmbeddingService {
+export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
   genAIModel: GenerativeModel;
-  constructor(protected readonly apiKey: string, protected readonly AIModel: string) {
-    this.genAIModel = new GoogleGenerativeAI(this.apiKey).getGenerativeModel({ model: this.AIModel });
+  constructor(apiKey: string, AIModel: string) {
+    super(apiKey, AIModel);
   }
   /**
    * Generates embeddings for the given text using the generative model.

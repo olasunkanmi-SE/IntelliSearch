@@ -13,6 +13,7 @@ export class AppService extends EmbeddingService {
     let text: string;
     if (this.documentPath.length) {
       text = await documentService.convertPDFToText(this.documentPath);
+      // console.log(documentService.breakTextIntoChunks(text, 100));
     }
     if (text) {
       console.log("...generating embeddings");

@@ -1,4 +1,6 @@
+import { TaskType } from "@google/generative-ai";
+
 export interface IEmbeddingService {
-  generateEmbeddings(text: string): Promise<number[]>;
+  generateEmbeddings(taskType: TaskType, role?: string): Promise<number[]>;
   cosineSimilarity(vecA: number[], vecB: number[]): number;
 }

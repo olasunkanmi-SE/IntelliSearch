@@ -32,12 +32,12 @@ initializeDatabase();
 const filePath: string = getValue("PDF_ABSOLUTE_PATH");
 const apiKey: string = getValue("API_KEY");
 
-const createEmbedding = async () => {
-  const appService = new AppService(apiKey, filePath, CONSTANTS.AIModels.embedding);
-  return await appService.createEmbeddings();
-};
+// const createEmbedding = async () => {
+//   const appService = new AppService(apiKey, filePath, CONSTANTS.AIModels.embedding);
+//   return await appService.createContentEmbeddings();
+// };
 
-const repo = new GenericSQLRepository().createProductsAndReviews();
+// const repo = new GenericSQLRepository().createProductsAndReviews();
 const port: number = Number(process.env.PORT) || 3000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}.`);

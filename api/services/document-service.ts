@@ -25,4 +25,27 @@ export class DocumentService implements IDocumentService {
       }
     });
   }
+
+  breakTextIntoChunks(text: string, partSize: number): string[] {
+    const chunks: string[] = [];
+    let startIndex = 0;
+    while (startIndex < text.length) {
+      let chunk = text.substring(startIndex, partSize);
+      const chunkSize = startIndex + partSize;
+      //Check if a chunk ends in the middle of a word
+      if (chunkSize < text.length && !/\s[---]/.test(text[chunkSize - 1])) {
+        //Find the last natural break within the chunk
+        const lastSpaceIndex = chunk.lastIndexOf("");
+        const lastDashIndex = Math.max(chunk.lastIndexOf("-"), chunk.lastIndexOf("–"), chunk.lastIndexOf("—"));
+        const breakIndex = Math.max(lastSpaceIndex, lastDashIndex);
+        if (breakIndex !== -1) {
+          //Recreate the chunck based on the next break
+          chunk = chunk.substring(0, breakIndex + 1);
+        }
+      }
+      chunks.push(chunk);
+      startIndex += chunk.length;
+    }
+    return chunks;
+  }
 }

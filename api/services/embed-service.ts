@@ -1,9 +1,12 @@
-import { GenerativeModel, GoogleGenerativeAI, TaskType } from "@google/generative-ai";
+import {
+  GenerativeModel,
+  GoogleGenerativeAI,
+  TaskType,
+} from "@google/generative-ai";
 import { IEmbeddingService } from "../interfaces/embedding-service.interface";
 import { GenerativeAIService } from "./ai.service";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
- * For a retrieval task, which is specified by setting `taskType` to `TaskType.RETRIEVAL_QUERY`, 
  * the following roles are commonly used:
 
 * **""** (empty string): Typically used for text that is not assigned a specific role or is the primary content being analyzed.
@@ -42,7 +45,10 @@ A typical use case for the `RETRIEVAL_DOCUMENT` task type is embedding documents
 of information. For example, you could use this task type to embed articles, FAQs, 
 or product manuals to create a searchable knowledge base for customer support or information retrieval systems.*/
 
-export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
+export class EmbeddingService
+  extends GenerativeAIService
+  implements IEmbeddingService
+{
   genAIModel: GenerativeModel;
   constructor(apiKey: string, AIModel: string) {
     super(apiKey, AIModel);
@@ -51,7 +57,11 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
    * Generates embeddings for the given text using the generative model.
    * @returns The embedding generated for the text.
    */
-  async generateEmbeddings(text: string, taskType: TaskType, role?: string): Promise<number[]> {
+  async generateEmbeddings(
+    text: string,
+    taskType: TaskType,
+    role?: string
+  ): Promise<number[]> {
     if (!Object.values(TaskType).includes(taskType)) {
       throw new Error("Please provide a valid task type");
     }

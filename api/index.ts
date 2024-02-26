@@ -40,8 +40,8 @@ const apiKey: string = getValue("API_KEY");
 
 // createEmbedding();
 
-const chat = new Chat(apiKey, CONSTANTS.AIModels.chat);
-chat.run();
+// const chat = new Chat(apiKey, CONSTANTS.AIModels.chat);
+// chat.run();
 
 // const repo = new GenericSQLRepository().createProductsAndReviews();
 const port: number = Number(process.env.PORT) || 3000;

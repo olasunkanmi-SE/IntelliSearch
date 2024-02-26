@@ -10,4 +10,4 @@ services:
     volumes:
       - ./api/pgdata:/postgres/data
     ports:
-      - 35000:5432
+      - 5432:5432

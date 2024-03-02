@@ -26,7 +26,6 @@ export class DocumentService implements IDocumentService {
   }
   /**
    * Splits the input text into chunks of approximately equal sizes, ensuring that words are not broken in the middle.
-   *
    * @param {string} text - The input text to be divided into chunks.
    * @param {number} partSize - The desired size of each chunk (in number of characters).
    * @returns {string[]} An array containing the divided chunks of text.
@@ -37,21 +36,25 @@ export class DocumentService implements IDocumentService {
     while (startIndex < text.length) {
       const chunkSize = startIndex + partSize;
       let chunk = text.substring(startIndex, chunkSize);
-      //Check if a chunk ends in the middle of a word
-      if (chunkSize < text.length && !/\s[---]/.test(text[chunkSize - 1])) {
-        //Find the last natural break within the chunk
-        const lastSpaceIndex = chunk.lastIndexOf("");
-        const lastDashIndex = Math.max(chunk.lastIndexOf("-"), chunk.lastIndexOf("–"), chunk.lastIndexOf("—"));
-        const breakIndex = Math.max(lastSpaceIndex, lastDashIndex);
-        if (breakIndex !== -1) {
-          //Recreate the chunck based on the next break
-          chunk = chunk.substring(0, breakIndex + 1);
-        }
+      //check if the chunck doesn't ends with "-", en dash "–", and em dash "—" and whitspace
+      const isCharacterNotAtTheEndOfChunk: boolean = !/\s[---]/.test(text[chunkSize - 1]);
+      if (isCharacterNotAtTheEndOfChunk) {
+        chunk = this.adjustChunkToEndAtCharacter(chunk);
       }
       chunks.push(chunk);
       startIndex += chunk.length;
     }
     return chunks;
+  }
+
+  adjustChunkToEndAtCharacter(chunk: string): string {
+    //Find the last natural break within the chunk
+    const lastSpaceIndex = chunk.lastIndexOf("");
+    const lastDashIndex = Math.max(chunk.lastIndexOf("-"), chunk.lastIndexOf("–"), chunk.lastIndexOf("—"));
+    const breakIndex = Math.max(lastSpaceIndex, lastDashIndex);
+    //Recreate the chunck based on the next break
+    chunk = chunk.substring(0, breakIndex + 1);
+    return chunk;
   }
 
   /**

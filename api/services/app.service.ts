@@ -15,14 +15,14 @@ export class AppService extends EmbeddingService {
       text = await documentService.convertPDFToText(this.documentPath);
       // console.log(documentService.breakTextIntoChunks(text, 100));
     }
-    if (text) {
-      console.log("...generating embeddings");
-      const embeddings = await this.generateEmbeddings(text, TaskType.RETRIEVAL_DOCUMENT);
-      if (embeddings) {
-        console.log("...embeddings generated");
-        return await database.createDocument(text, embeddings);
-      }
-    }
+    // if (text) {
+    //   console.log("...generating embeddings");
+    //   const embeddings = await this.generateEmbeddings(text, TaskType.RETRIEVAL_DOCUMENT);
+    //   if (embeddings) {
+    //     console.log("...embeddings generated");
+    //     return await database.createDocument(text, embeddings);
+    //   }
+    // }
   }
 
   // async search(prompt: string) {

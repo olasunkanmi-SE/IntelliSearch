@@ -20,6 +20,10 @@ export class Chat extends GenerativeAIService {
         {
           role: "user",
           parts: stripIndents`${oneLine` 
+      Using the information contained in the context,
+      give a comprehensive answer to the question.
+      Respond only to the question asked, response should be concise and relevant to the question.
+      If the answer cannot be deduced from the context, do not give an answer.     
       Monday, January 2nd
       9:00 AM - 10:30 AM: Kick-off meeting with Product Development team
       11:00 AM - 12:30 PM: Architecture review for new project

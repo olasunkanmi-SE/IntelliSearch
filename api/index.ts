@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 import express, { Express } from "express";
 import { getValue } from "./utils";
+import { AppService } from "./services/app.service";
+import { CONSTANTS } from "./core/constants";
 const app: Express = express();
 
 const prisma = new PrismaClient();

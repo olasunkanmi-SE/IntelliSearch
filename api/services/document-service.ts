@@ -37,8 +37,8 @@ export class DocumentService implements IDocumentService {
       const chunkSize = startIndex + partSize;
       let chunk = text.substring(startIndex, chunkSize);
       //check if the chunck doesn't ends with "-", en dash "–", and em dash "—" and whitspace
-      const isCharacterNotAtTheEndOfChunk: boolean = !/\s[---]/.test(text[chunkSize - 1]);
-      if (isCharacterNotAtTheEndOfChunk) {
+      const characterNotAtTheEndOfChunk: boolean = !/\s[---]/.test(text[chunkSize - 1]);
+      if (characterNotAtTheEndOfChunk) {
         chunk = this.adjustChunkToEndAtCharacter(chunk);
       }
       chunks.push(chunk);
@@ -66,32 +66,18 @@ export class DocumentService implements IDocumentService {
    */
   formatText = (text: string) => {
     const formattedText = text
-      .replace(/(\*|_)/g, " ")
+      .replace(/(\\*|\\_)/g, " ")
       .replace(/\[.*?\]/g, "")
       .replace(/<.*?>/g, "")
       .replace(/\n/g, " ");
     const lowercaseText = formattedText.toLowerCase();
     const stopWords = [
-      "a",
-      "an",
       "and",
       "are",
-      "as",
-      "at",
-      "be",
       "but",
-      "by",
       "for",
-      "if",
-      "in",
       "into",
-      "is",
-      "it",
-      "no",
       "not",
-      "of",
-      "on",
-      "or",
       "such",
       "that",
       "the",
@@ -100,7 +86,6 @@ export class DocumentService implements IDocumentService {
       "these",
       "they",
       "this",
-      "to",
       "was",
       "will",
       "with",

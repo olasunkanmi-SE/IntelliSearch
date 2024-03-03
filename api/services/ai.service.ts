@@ -1,13 +1,8 @@
-import { GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
+import { GenerationConfig, GenerativeModel, GoogleGenerativeAI } from "@google/generative-ai";
+import { CONSTANTS } from "../core/constants";
 
 export class GenerativeAIService {
-  private config: {
-    stopSequences: ["red"];
-    maxOutputTokens: 200;
-    temperature: 0.9;
-    topP: 0.1;
-    topK: 16;
-  };
+  private config: GenerationConfig = CONSTANTS.modelConfig;
   protected generativeAi: GoogleGenerativeAI;
   constructor(private apiKey: string, private AIModel: string) {
     this.generativeAi = new GoogleGenerativeAI(this.apiKey);

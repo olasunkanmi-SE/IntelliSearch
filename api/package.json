@@ -10,7 +10,9 @@
     "start": "node dist/index.js",
     "start:dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
     "test": "jest",
-    "prisma:migrate": "npx prisma migrate dev --name init"
+    "prisma:init": "npx prisma init",
+    "prisma:migrate": "npx prisma migrate dev --name init",
+    "prisma:update": "npx prisma migrate deploy"
   },
   "keywords": [],
   "dependencies": {

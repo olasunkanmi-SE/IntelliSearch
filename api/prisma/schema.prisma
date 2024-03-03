@@ -23,9 +23,12 @@ model Document {
 }
 
 model Embedding {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   text       String
   vector     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  deletedAt  DateTime?
   documentId Int
-  Document   Document @relation("documentEmbeddings", fields: [documentId], references: [id], onDelete: Cascade)
+  Document   Document  @relation("documentEmbeddings", fields: [documentId], references: [id], onDelete: Cascade)
 }

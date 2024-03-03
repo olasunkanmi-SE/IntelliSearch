@@ -64,7 +64,7 @@ export class DocumentService implements IDocumentService {
    * @param {string} text - The input text to be formatted.
    * @returns {string} The preprocessed text after formatting.
    */
-  formatText = (text: string) => {
+  formatText = (text: string): string => {
     const formattedText = text
       .replace(/(\\*|\\_)/g, " ")
       .replace(/\[.*?\]/g, "")

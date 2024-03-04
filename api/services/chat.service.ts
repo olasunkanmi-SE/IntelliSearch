@@ -1,4 +1,9 @@
-import { ChatSession, CountTokensRequest, EnhancedGenerateContentResponse, Part } from "@google/generative-ai";
+import {
+  ChatSession,
+  CountTokensRequest,
+  EnhancedGenerateContentResponse,
+  Part,
+} from "@google/generative-ai";
 import { oneLine, stripIndents } from "common-tags";
 import { GenerativeAIService } from "./ai.service";
 
@@ -34,18 +39,21 @@ export class Chat extends GenerativeAIService {
     return await model.startChat(this.initialConvo);
   };
   async run() {
-    const msg1 = "What time is the kick-off meeting with the Product Development team on January 2nd?";
+    const msg1 =
+      "What time is the kick-off meeting with the Product Development team on January 2nd?";
     this.displayChatTokenCount(msg1);
     const chat = await this.initChat();
     const result1 = await chat.sendMessageStream(msg1);
     this.streamToStdout(result1.stream);
 
-    const msg2 = "What is the topic of the architecture review meeting on January 3rd?";
+    const msg2 =
+      "What is the topic of the architecture review meeting on January 3rd?";
     this.displayChatTokenCount(msg2);
     const result2 = await chat.sendMessageStream(msg2);
     this.streamToStdout(result2.stream);
 
-    const msg3 = "What is the focus of the retrospective and planning session on January 4th";
+    const msg3 =
+      "What is the focus of the retrospective and planning session on January 4th";
     this.displayChatTokenCount(msg3);
     const result3 = await chat.sendMessageStream(msg3);
     this.streamToStdout(result3.stream);
@@ -68,7 +76,9 @@ export class Chat extends GenerativeAIService {
     // console.log(JSON.stringify(response, null, 2));
   }
 
-  displayTokenCount = async (request: string | (string | Part)[] | CountTokensRequest) => {
+  displayTokenCount = async (
+    request: string | (string | Part)[] | CountTokensRequest,
+  ) => {
     const model = await this.generativeModel();
     const { totalTokens } = await model.countTokens(request);
     console.log("Token count", totalTokens);
@@ -81,7 +91,9 @@ export class Chat extends GenerativeAIService {
     await this.displayTokenCount({ contents: [...history, msgContent] });
   };
 
-  streamToStdout = async (stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>) => {
+  streamToStdout = async (
+    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>,
+  ) => {
     console.log("Streaming...\n");
     for await (const chunk of stream) {
       const chunkText = chunk.text();

@@ -1,3 +1,3 @@
 export interface IAppService {
-  createContentEmbeddings(): Promise<number[][]>;
+  createContentEmbeddings(): Promise<{ text: string; embeddings?: number[] }[]>;
 }

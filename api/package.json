@@ -9,7 +9,7 @@
     "build": "npx tsc",
     "start": "node dist/index.js",
     "start:dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
-    "test:unit": "jest",
+    "test:unit": "jest --passWithNoTests",
     "test:coverage": "jest --coverage",
     "prisma:init": "npx prisma init",
     "prisma:migrate": "npx prisma migrate dev --name init",

@@ -44,13 +44,4 @@ export class AppService extends EmbeddingService implements IAppService {
       return [...textMap.values()];
     }
   }
-
-  async createEmbedding() {
-    try {
-      const contentEmbeddings = await this.createContentEmbeddings();
-      if (!contentEmbeddings) {
-        throw new Error("Embeddings not found ");
-      }
-    } catch (error) {}
-  }
 }

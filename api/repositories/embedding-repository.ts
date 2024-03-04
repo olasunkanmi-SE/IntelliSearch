@@ -5,7 +5,7 @@ import { IDocumentModel, IEmbeddingModel } from "./model";
 import { DocumentRepository } from "./document-repository";
 import { AppService } from "../services/app.service";
 import { getValue } from "../utils";
-import { CONSTANTS } from "../core/constants";
+import { AiModels } from "../core/constants";
 
 export class EmbeddingRepository extends Database {
   constructor() {
@@ -58,13 +58,16 @@ export class EmbeddingRepository extends Database {
     try {
       const filePath: string = getValue("PDF_ABSOLUTE_PATH");
       const apiKey: string = getValue("API_KEY");
-      const aiModel: string = CONSTANTS.AIModels.embedding;
+      const aiModel: string = AiModels.embedding;
       const documentRepository = new DocumentRepository();
       const appService = new AppService(apiKey, filePath, aiModel);
       await this.prisma.$transaction(async (prisma) => {
         const document: IDocumentModel = await documentRepository.create(title);
-        const documentId = document.id;
-        const documentEmbeddings = await appService.createContentEmbeddings();
+        const documentId: number = document.id;
+        const documentEmbeddings: {
+          text: string;
+          embeddings?: number[];
+        }[] = await appService.createContentEmbeddings();
         if (documentEmbeddings?.length) {
           const embeddingModels: IEmbeddingModel[] = documentEmbeddings.map(
             (doc) => {

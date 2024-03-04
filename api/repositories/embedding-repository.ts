@@ -13,6 +13,7 @@ export class EmbeddingRepository extends Database {
       const { text, vector, documentId } = props;
       const embedding = await this.prisma.embedding.create({
         data: {
+          text,
           vector,
           documentId,
         },

@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 import express, { Express } from "express";
 import { getValue } from "./utils";
@@ -6,22 +5,23 @@ import { AppService } from "./services/app.service";
 import { CONSTANTS } from "./core/constants";
 const app: Express = express();
 
-const prisma = new PrismaClient();
-
 app.get(`/post`, async (req, res) => {
-  const result = await prisma.document.count();
+  console.log("hello");
+  const result = await createEmbedding();
   return res.json(result);
 });
 
 const filePath: string = getValue("PDF_ABSOLUTE_PATH");
 const apiKey: string = getValue("API_KEY");
 
-// const createEmbedding = async () => {
-//   const appService = new AppService(apiKey, filePath, CONSTANTS.AIModels.embedding);
-//   return await appService.createContentEmbeddings();
-// };
-
-// createEmbedding();
+const createEmbedding = async () => {
+  const appService = new AppService(
+    apiKey,
+    filePath,
+    CONSTANTS.AIModels.embedding,
+  );
+  return await appService.createContentEmbeddings();
+};
 
 // const chat = new Chat(apiKey, CONSTANTS.AIModels.chat);
 // chat.run();

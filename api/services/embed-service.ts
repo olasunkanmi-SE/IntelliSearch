@@ -41,7 +41,10 @@ A typical use case for the `RETRIEVAL_DOCUMENT` task type is embedding documents
 of information. For example, you could use this task type to embed articles, FAQs, 
 or product manuals to create a searchable knowledge base for customer support or information retrieval systems.*/
 
-export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
+export class EmbeddingService
+  extends GenerativeAIService
+  implements IEmbeddingService
+{
   constructor(apiKey: string, AIModel: string) {
     super(apiKey, AIModel);
   }
@@ -49,7 +52,11 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
    * Generates embeddings for the given text using the generative model.
    * @returns The embedding generated for the text.
    */
-  async generateEmbeddings(text: string, taskType: TaskType, role?: string): Promise<number[]> {
+  async generateEmbeddings(
+    text: string,
+    taskType: TaskType,
+    role?: string,
+  ): Promise<number[]> {
     if (!Object.values(TaskType).includes(taskType)) {
       throw new Error("Please provide a valid task type");
     }

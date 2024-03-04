@@ -21,6 +21,8 @@ jobs:
           npm i typescript
           npm run build
           npm run format
+          npm run test:unit
+          npm run test:coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

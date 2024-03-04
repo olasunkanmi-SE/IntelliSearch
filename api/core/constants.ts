@@ -1,13 +1,34 @@
-export const CONSTANTS = {
-  AIModels: {
-    embedding: "embedding-001",
-    chat: "gemini-pro",
-  },
+export const AiModels = {
+  embedding: "embedding-001",
+  chat: "gemini-pro",
+};
 
-  modelConfig: {
-    maxOutputTokens: 200,
-    temperature: 0.9,
-    topP: 0.1,
-    topK: 16,
-  },
+export const modelConfig = {
+  maxOutputTokens: 200,
+  temperature: 0.9,
+  topP: 0.1,
+  topK: 16,
+};
+
+export const HTTP_RESPONSE_CODE = {
+  NOT_FOUND: 404,
+  CREATED: 201,
+  CONFLICT: 409,
+  BAD_REQUEST: 400,
+  SUCCESS: 200,
+  UNAUTHORIZED: 401,
+  SERVER_ERROR: 500,
+};
+
+export const enum HttpStatusCode {
+  NOT_FOUND = 404,
+  CREATED = 201,
+  CONFLICT = 409,
+  BAD_REQUEST = 400,
+  SUCCESS = 200,
+  UNAUTHORIZED = 401,
+}
+
+export const APP_ERROR_MESSAGE = {
+  serverError: "Something went wrong, try again later",
 };

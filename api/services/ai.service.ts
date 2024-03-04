@@ -3,14 +3,14 @@ import {
   GenerativeModel,
   GoogleGenerativeAI,
 } from "@google/generative-ai";
-import { CONSTANTS } from "../core/constants";
+import { modelConfig } from "../core/constants";
 
 export class GenerativeAIService {
-  private config: GenerationConfig = CONSTANTS.modelConfig;
+  private config: GenerationConfig = modelConfig;
   protected generativeAi: GoogleGenerativeAI;
   constructor(
     private apiKey: string,
-    private AIModel: string,
+    private AIModel: string
   ) {
     this.generativeAi = new GoogleGenerativeAI(this.apiKey);
   }

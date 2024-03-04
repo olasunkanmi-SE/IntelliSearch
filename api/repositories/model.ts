@@ -4,13 +4,14 @@ export interface IDocumentModel extends IAudit {
 }
 
 export interface IEmbeddingModel extends IAudit {
-  id: number;
+  id?: number;
   vector: string;
+  text: string;
   documentId: number;
 }
 
 export interface IAudit {
-  createdAt: Date;
+  createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
 }

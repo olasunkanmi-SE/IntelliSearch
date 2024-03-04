@@ -3,7 +3,7 @@ import {
   GenerativeModel,
   GoogleGenerativeAI,
 } from "@google/generative-ai";
-import { modelConfig } from "../core/constants";
+import { modelConfig } from "../lib/constants";
 
 export class GenerativeAIService {
   private config: GenerationConfig = modelConfig;

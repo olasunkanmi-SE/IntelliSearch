@@ -5,7 +5,7 @@ import { IDocumentModel, IEmbeddingModel } from "./model";
 import { DocumentRepository } from "./document-repository";
 import { AppService } from "../services/app.service";
 import { getValue } from "../utils";
-import { AiModels } from "../core/constants";
+import { AiModels } from "../lib/constants";
 
 export class EmbeddingRepository extends Database {
   constructor() {
@@ -54,7 +54,7 @@ export class EmbeddingRepository extends Database {
     }
   }
 
-  async createDocumentAndEmbeddings(title: string) {
+  async createDocumentAndEmbeddings(title: string): Promise<boolean> {
     try {
       const filePath: string = getValue("PDF_ABSOLUTE_PATH");
       const apiKey: string = getValue("API_KEY");
@@ -79,12 +79,36 @@ export class EmbeddingRepository extends Database {
             }
           );
           await this.insertMany(embeddingModels);
+          return true;
         } else {
           console.warn("No embeddings found for the document.");
         }
       });
     } catch (error) {
       console.error(error);
+      return false;
+    }
+  }
+
+  /**
+   * Creates an index on the `vector` field of the `embedding` table using the IVF Flat algorithm.
+   * The IVF Flat algorithm is a vector index that uses a flat structure to store the vectors.
+   * It is designed for fast approximate nearest neighbor search.
+   * The `lists` parameter specifies the number of lists to use in the index.
+   * A higher number of lists will result in a more accurate index,
+   * but will also increase the index size and search time.
+   * https://github.com/pgvector/pgvector#indexing
+   */
+  async createIvfflatIndex() {
+    try {
+      await this.prisma.$queryRaw`
+          CREATE INDEX IF NOT EXISTS items_embedding_ivfflat_index
+          ON embedding
+          USING ivfflat (vector vector_cosine_ops)
+          WITH (lists = 100);
+        `;
+    } catch (error) {
+      console.error("Error setting index on documents", error);
     }
   }
 }

@@ -3,3 +3,5 @@ node_modules
 api/dist
 api/pdfs
 api/txt
+api/coverage
+api/pgdata

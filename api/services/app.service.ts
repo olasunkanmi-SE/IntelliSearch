@@ -8,7 +8,7 @@ export class AppService extends EmbeddingService implements IAppService {
   constructor(
     apikey: string,
     private readonly documentPath: string,
-    AIModel: string,
+    AIModel: string
   ) {
     super(apikey, AIModel);
   }
@@ -30,7 +30,7 @@ export class AppService extends EmbeddingService implements IAppService {
     }, new Map<number, { text: string; embeddings?: number[] }>());
 
     const contentEmbed = chunks.map((chunk) =>
-      this.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context"),
+      this.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context")
     );
 
     const embeddings: number[][] = await Promise.all(contentEmbed);
@@ -43,5 +43,14 @@ export class AppService extends EmbeddingService implements IAppService {
       });
       return [...textMap.values()];
     }
+  }
+
+  async createEmbedding() {
+    try {
+      const contentEmbeddings = await this.createContentEmbeddings();
+      if (!contentEmbeddings) {
+        throw new Error("Embeddings not found ");
+      }
+    } catch (error) {}
   }
 }

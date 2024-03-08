@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { DocumentTypeEnum, DomainEnum } from './constants';
 
 const title = z.string();
-export const documentRequestSchema = z.object({ title });
+const documentType = z.nativeEnum(DocumentTypeEnum)
+const domain = z.nativeEnum(DomainEnum)
+export const documentRequestSchema = z.object({ title, documentType, domain });

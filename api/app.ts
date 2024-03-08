@@ -6,7 +6,7 @@ export class App {
 
   constructor(
     private readonly controllers: unknown,
-    private readonly port: number
+    private readonly port: number,
   ) {
     this.app = express();
     this.initControllers(this.controllers);

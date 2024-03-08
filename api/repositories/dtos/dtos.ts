@@ -4,6 +4,8 @@ export interface ICreateDocumentDTO {
 
 export interface ICreateEmbeddingDTO {
   text: string;
-  vector: string;
+  textEmbedding: string;
   documentId: number;
+  domainId: number;
+  documentTypeId: number;
 }

@@ -13,22 +13,81 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Document {
-  id        Int         @id @default(autoincrement())
-  title     String      @db.VarChar(255)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime?   @updatedAt
-  deletedAt DateTime?
-  Embedding Embedding[] @relation("documentEmbeddings")
+enum DocumentTypeEnum {
+  ARTICLE
+  BLOG
+  RESEARCH_PAPER
+  NEWS
+  TWEET
+  BOOK
 }
 
-model Embedding {
-  id         Int       @id @default(autoincrement())
-  vector     String
-  text       String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
+enum DomainEnum {
+  FINANCE
+  HEALTHCARE
+  TECHNOLOGY
+  SPORTS
+  COMPUTER_SCIENCE
+}
+
+model Documents {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(255)
+  source      String?
+  author      String?
+  publishedAt DateTime?
+  language    String?
+  category    String?
+  url         String?
+  score       Float?
+  numTokens   Int?
+  createdBy   String?
+  updatedBy   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime?    @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+  Embeddings  Embeddings[]
+}
+
+model Embeddings {
+  id             Int            @id @default(autoincrement())
+  textEmbedding  String
+  text           String
+  createdBy      String?
+  updatedBy      String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime?      @updatedAt
+  deletedAt      DateTime?
+  deletedBy      String?
+  documentId     Int
+  Documents      Documents      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  DocumentType   DocumentTypes? @relation(fields: [documentTypeId], references: [id])
+  documentTypeId Int
+  Domain         Domains?       @relation(fields: [domainId], references: [id])
+  domainId       Int
+}
+
+model DocumentTypes {
+  id         Int              @id @default(autoincrement())
+  name       DocumentTypeEnum
+  createdBy  String?
+  updatedBy  String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime?        @updatedAt
   deletedAt  DateTime?
-  documentId Int
-  Document   Document  @relation("documentEmbeddings", fields: [documentId], references: [id], onDelete: Cascade)
+  deletedBy  String?
+  embeddings Embeddings[]
+}
+
+model Domains {
+  id         Int          @id @default(autoincrement())
+  name       DomainEnum
+  createdBy  String?
+  updatedBy  String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime?    @updatedAt
+  deletedAt  DateTime?
+  deletedBy  String?
+  embeddings Embeddings[]
 }

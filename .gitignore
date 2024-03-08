@@ -5,3 +5,4 @@ api/pdfs
 api/txt
 api/coverage
 api/pgdata
+api/prisma/migrations

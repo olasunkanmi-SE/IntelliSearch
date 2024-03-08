@@ -1,24 +1,16 @@
+import { DocumentTypeService } from "./../services/document-type.service";
 import { Prisma } from "@prisma/client";
 import { Database } from "./database";
 import { ICreateEmbeddingDTO } from "./dtos/dtos";
-import {
-  IDocumentModel,
-  IDocumentTypeModel,
-  IDomainModel,
-  IEmbeddingModel,
-} from "./model";
+import { IDocumentModel, IDocumentTypeModel, IDomainModel, IEmbeddingModel } from "./model";
 import { DocumentRepository } from "./document.repository";
 import { AppService } from "../services/app.service";
 import { getValue } from "../utils";
-import {
-  AiModels,
-  DocumentTypeEnum,
-  DomainEnum,
-  HTTP_RESPONSE_CODE,
-} from "../lib/constants";
+import { AiModels, DocumentTypeEnum, DomainEnum, HTTP_RESPONSE_CODE } from "../lib/constants";
 import { DocumentTypeRepository } from "./document-type.repository";
 import { DomainRepository } from "./domain.repository";
 import { HttpException } from "../exceptions/exception";
+import { DomainService } from "../services/domain.service";
 
 export class EmbeddingRepository extends Database {
   constructor() {
@@ -27,8 +19,7 @@ export class EmbeddingRepository extends Database {
 
   async create(props: ICreateEmbeddingDTO): Promise<IEmbeddingModel> {
     try {
-      const { text, textEmbedding, documentId, domainId, documentTypeId } =
-        props;
+      const { text, textEmbedding, documentId, domainId, documentTypeId } = props;
       const embedding = await this.prisma.embeddings.create({
         data: {
           text,
@@ -39,10 +30,7 @@ export class EmbeddingRepository extends Database {
         },
       });
       if (!embedding) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.SERVER_ERROR,
-          "Unable to create embedding",
-        );
+        throw new HttpException(HTTP_RESPONSE_CODE.SERVER_ERROR, "Unable to create embedding");
       }
       return embedding;
     } catch (error) {
@@ -62,9 +50,7 @@ export class EmbeddingRepository extends Database {
     }
   }
 
-  async insertMany(
-    props: IEmbeddingModel[],
-  ): Promise<Prisma.PrismaPromise<{ count: number }>> {
+  async insertMany(props: IEmbeddingModel[]): Promise<Prisma.PrismaPromise<{ count: number }>> {
     try {
       const result = await this.prisma.embeddings.createMany({ data: props });
       return result.count > 0 ? result : { count: 0 };
@@ -73,10 +59,19 @@ export class EmbeddingRepository extends Database {
     }
   }
 
+  /**
+   * Creates a new document and generates embeddings for its content.
+   *
+   * @param {string} title - The title of the document.
+   * @param {DocumentTypeEnum} documentType - The type of the document.
+   * @param {DomainEnum} domain - The domain of the document.
+   * @returns {Promise<boolean>} - A promise that resolves to true if the document and embeddings are created successfully, false otherwise.
+   * @throws {Error} - If the document type or domain doesn't exist, or if unable to create document embeddings.
+   */
   async createDocumentsAndEmbeddings(
     title: string,
     documentType: DocumentTypeEnum,
-    domain: DomainEnum,
+    domain: DomainEnum
   ): Promise<boolean> {
     try {
       const filePath: string = getValue("PDF_ABSOLUTE_PATH");
@@ -84,40 +79,37 @@ export class EmbeddingRepository extends Database {
       const aiModel: string = AiModels.embedding;
 
       const documentRepository: DocumentRepository = new DocumentRepository();
-      const documentRepositoryType: DocumentTypeRepository =
-        new DocumentTypeRepository();
+      const documentRepositoryType: DocumentTypeRepository = new DocumentTypeRepository();
       const domainRepository: DomainRepository = new DomainRepository();
+      const domainService: DomainService = new DomainService();
+      const documentTypeService: DocumentTypeService = new DocumentTypeService();
 
       const appService = new AppService(apiKey, filePath, aiModel);
 
       await this.prisma.$transaction(async (prisma) => {
-        const docType: IDocumentTypeModel | undefined =
-          await this.getDocumentType(documentRepositoryType, documentType);
+        const docType: IDocumentTypeModel | undefined = await documentTypeService.getDocumentType(
+          documentRepositoryType,
+          documentType
+        );
         const documentTypeId: number = docType.id;
 
-        const docDomain: IDomainModel | undefined = await this.getDomain(
-          domainRepository,
-          domain,
-        );
+        const docDomain: IDomainModel | undefined = await domainService.getDomain(domainRepository, domain);
         const domainId: number = docDomain.id;
 
         const document: IDocumentModel = await documentRepository.create(title);
         const documentId: number = document.id;
-
+        //TODO: The file URl should be part of the request
         const documentEmbeddings: { text: string; embeddings?: number[] }[] =
           await appService.createContentEmbeddings();
         if (!documentEmbeddings?.length) {
-          throw new HttpException(
-            HTTP_RESPONSE_CODE.BAD_REQUEST,
-            "Unable to create embedding",
-          );
+          throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to create embedding");
         }
 
         const embeddingModels: IEmbeddingModel[] = this.createEmbeddingModels(
           documentEmbeddings,
           documentId,
           documentTypeId,
-          domainId,
+          domainId
         );
 
         await this.insertMany(embeddingModels);
@@ -129,53 +121,20 @@ export class EmbeddingRepository extends Database {
     }
   }
 
-  private async getDocumentType(
-    documentRepositoryType: DocumentTypeRepository,
-    documentType: DocumentTypeEnum,
-  ): Promise<IDocumentTypeModel> {
-    try {
-      let docType: IDocumentTypeModel | undefined;
-      if (Object.values(DocumentTypeEnum).includes(documentType)) {
-        docType = await documentRepositoryType.findOne(documentType);
-      }
-      if (!docType) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "Document type doesn't exist",
-        );
-      }
-      return docType;
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  private async getDomain(
-    domainRepository: DomainRepository,
-    domain: DomainEnum,
-  ): Promise<IDomainModel> {
-    try {
-      let docDomain: IDomainModel | undefined;
-      if (Object.values(DomainEnum).includes(domain)) {
-        docDomain = await domainRepository.findOne(domain);
-      }
-      if (!docDomain) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "Domain doesn't exist",
-        );
-      }
-      return docDomain;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
+  /**
+   * Creates embedding models from the provided document embeddings.
+   *
+   * @param {Array<{ text: string; embeddings?: number[] }>} documentEmbeddings - The document embeddings.
+   * @param {number} documentId - The ID of the associated document.
+   * @param {number} documentTypeId - The ID of the associated document type.
+   * @param {number} domainId - The ID of the associated domain.
+   * @returns {IEmbeddingModel[]} - An array of embedding models.
+   */
   private createEmbeddingModels(
     documentEmbeddings: { text: string; embeddings?: number[] }[],
     documentId: number,
     documentTypeId: number,
-    domainId: number,
+    domainId: number
   ): IEmbeddingModel[] {
     return documentEmbeddings.map((doc) => ({
       textEmbedding: JSON.stringify(doc.embeddings),
@@ -212,11 +171,7 @@ export class EmbeddingRepository extends Database {
   /**
    * Queries the database for listings that are similar to a given embedding.
    */
-  async queryDocumentsBySimilarity(
-    embedding: string,
-    matchThreshold: number,
-    matchCnt: number,
-  ) {
+  async queryDocumentsBySimilarity(embedding: string, matchThreshold: number, matchCnt: number) {
     //change text to document_embedding
     const listings = await this.prisma.$queryRaw`
         SELECT 

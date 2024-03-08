@@ -17,3 +17,7 @@ export interface ICreateEmbeddingRequestDTO {
   documentType: DocumentTypeEnum;
   domain: DomainEnum;
 }
+
+export interface ICreateDomainRequestDTO {
+  name: DomainEnum;
+}

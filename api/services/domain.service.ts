@@ -12,14 +12,20 @@ export class DomainService {
    * @returns {Promise<IDomainModel>} - A promise that resolves to the domain model.
    * @throws {Error} - If the domain doesn't exist.
    */
-  async getDomain(domainRepository: DomainRepository, domain: DomainEnum): Promise<IDomainModel> {
+  async getDomain(
+    domainRepository: DomainRepository,
+    domain: DomainEnum,
+  ): Promise<IDomainModel> {
     try {
       let docDomain: IDomainModel | undefined;
       if (Object.values(DomainEnum).includes(domain)) {
         docDomain = await domainRepository.findOne(domain);
       }
       if (!docDomain) {
-        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Domain doesn't exist");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "Domain doesn't exist",
+        );
       }
       return docDomain;
     } catch (error) {

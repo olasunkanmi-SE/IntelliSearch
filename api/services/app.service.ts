@@ -10,17 +10,22 @@ export class AppService extends EmbeddingService implements IAppService {
   constructor(
     apikey: string,
     private readonly documentPath: string,
-    AIModel: string
+    AIModel: string,
   ) {
     super(apikey, AIModel);
   }
-  async createContentEmbeddings(): Promise<{ text: string; embeddings?: number[] }[]> {
+  async createContentEmbeddings(): Promise<
+    { text: string; embeddings?: number[] }[]
+  > {
     const documentService: IDocumentService = new DocumentService();
     let text: string;
     if (!this.documentPath.length) {
-      throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Could not read PDF file");
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        "Could not read PDF file",
+      );
     }
-
+    //convert chunks to text instead, incase the file is too large
     text = await documentService.convertPDFToText(this.documentPath);
     const chunks: string[] = documentService.breakTextIntoChunks(text, 4000);
 
@@ -29,7 +34,9 @@ export class AppService extends EmbeddingService implements IAppService {
       return map;
     }, new Map<number, { text: string; embeddings?: number[] }>());
 
-    const contentEmbed = chunks.map((chunk) => this.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context"));
+    const contentEmbed = chunks.map((chunk) =>
+      this.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context"),
+    );
 
     const embeddings: number[][] = await Promise.all(contentEmbed);
 

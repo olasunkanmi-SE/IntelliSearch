@@ -2,11 +2,21 @@ import { DocumentTypeService } from "./../services/document-type.service";
 import { Prisma } from "@prisma/client";
 import { Database } from "./database";
 import { ICreateEmbeddingDTO } from "./dtos/dtos";
-import { IDocumentModel, IDocumentTypeModel, IDomainModel, IEmbeddingModel } from "./model";
+import {
+  IDocumentModel,
+  IDocumentTypeModel,
+  IDomainModel,
+  IEmbeddingModel,
+} from "./model";
 import { DocumentRepository } from "./document.repository";
 import { AppService } from "../services/app.service";
 import { getValue } from "../utils";
-import { AiModels, DocumentTypeEnum, DomainEnum, HTTP_RESPONSE_CODE } from "../lib/constants";
+import {
+  AiModels,
+  DocumentTypeEnum,
+  DomainEnum,
+  HTTP_RESPONSE_CODE,
+} from "../lib/constants";
 import { DocumentTypeRepository } from "./document-type.repository";
 import { DomainRepository } from "./domain.repository";
 import { HttpException } from "../exceptions/exception";
@@ -19,7 +29,8 @@ export class EmbeddingRepository extends Database {
 
   async create(props: ICreateEmbeddingDTO): Promise<IEmbeddingModel> {
     try {
-      const { text, textEmbedding, documentId, domainId, documentTypeId } = props;
+      const { text, textEmbedding, documentId, domainId, documentTypeId } =
+        props;
       const embedding = await this.prisma.embeddings.create({
         data: {
           text,
@@ -30,7 +41,10 @@ export class EmbeddingRepository extends Database {
         },
       });
       if (!embedding) {
-        throw new HttpException(HTTP_RESPONSE_CODE.SERVER_ERROR, "Unable to create embedding");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.SERVER_ERROR,
+          "Unable to create embedding",
+        );
       }
       return embedding;
     } catch (error) {
@@ -50,7 +64,9 @@ export class EmbeddingRepository extends Database {
     }
   }
 
-  async insertMany(props: IEmbeddingModel[]): Promise<Prisma.PrismaPromise<{ count: number }>> {
+  async insertMany(
+    props: IEmbeddingModel[],
+  ): Promise<Prisma.PrismaPromise<{ count: number }>> {
     try {
       const result = await this.prisma.embeddings.createMany({ data: props });
       return result.count > 0 ? result : { count: 0 };
@@ -71,7 +87,7 @@ export class EmbeddingRepository extends Database {
   async createDocumentsAndEmbeddings(
     title: string,
     documentType: DocumentTypeEnum,
-    domain: DomainEnum
+    domain: DomainEnum,
   ): Promise<boolean> {
     try {
       const filePath: string = getValue("PDF_ABSOLUTE_PATH");
@@ -79,37 +95,45 @@ export class EmbeddingRepository extends Database {
       const aiModel: string = AiModels.embedding;
 
       const documentRepository: DocumentRepository = new DocumentRepository();
-      const documentRepositoryType: DocumentTypeRepository = new DocumentTypeRepository();
+      const documentRepositoryType: DocumentTypeRepository =
+        new DocumentTypeRepository();
       const domainRepository: DomainRepository = new DomainRepository();
       const domainService: DomainService = new DomainService();
-      const documentTypeService: DocumentTypeService = new DocumentTypeService();
+      const documentTypeService: DocumentTypeService =
+        new DocumentTypeService();
 
       const appService = new AppService(apiKey, filePath, aiModel);
 
       await this.prisma.$transaction(async (prisma) => {
-        const docType: IDocumentTypeModel | undefined = await documentTypeService.getDocumentType(
-          documentRepositoryType,
-          documentType
-        );
-        const documentTypeId: number = docType.id;
+        const docType: IDocumentTypeModel | undefined =
+          await documentTypeService.getDocumentType(
+            documentRepositoryType,
+            documentType,
+          );
+        const documentTypeId: number = 1;
 
-        const docDomain: IDomainModel | undefined = await domainService.getDomain(domainRepository, domain);
+        const docDomain: IDomainModel | undefined =
+          await domainService.getDomain(domainRepository, domain);
         const domainId: number = docDomain.id;
 
         const document: IDocumentModel = await documentRepository.create(title);
         const documentId: number = document.id;
         //TODO: The file URl should be part of the request
+        //Use Multer for file upload. https://github.com/expressjs/multer
         const documentEmbeddings: { text: string; embeddings?: number[] }[] =
           await appService.createContentEmbeddings();
         if (!documentEmbeddings?.length) {
-          throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to create embedding");
+          throw new HttpException(
+            HTTP_RESPONSE_CODE.BAD_REQUEST,
+            "Unable to create embedding",
+          );
         }
 
         const embeddingModels: IEmbeddingModel[] = this.createEmbeddingModels(
           documentEmbeddings,
           documentId,
           documentTypeId,
-          domainId
+          domainId,
         );
 
         await this.insertMany(embeddingModels);
@@ -134,7 +158,7 @@ export class EmbeddingRepository extends Database {
     documentEmbeddings: { text: string; embeddings?: number[] }[],
     documentId: number,
     documentTypeId: number,
-    domainId: number
+    domainId: number,
   ): IEmbeddingModel[] {
     return documentEmbeddings.map((doc) => ({
       textEmbedding: JSON.stringify(doc.embeddings),
@@ -171,7 +195,11 @@ export class EmbeddingRepository extends Database {
   /**
    * Queries the database for listings that are similar to a given embedding.
    */
-  async queryDocumentsBySimilarity(embedding: string, matchThreshold: number, matchCnt: number) {
+  async queryDocumentsBySimilarity(
+    embedding: string,
+    matchThreshold: number,
+    matchCnt: number,
+  ) {
     //change text to document_embedding
     const listings = await this.prisma.$queryRaw`
         SELECT 

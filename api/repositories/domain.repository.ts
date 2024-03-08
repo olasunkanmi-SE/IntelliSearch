@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
-import { DomainEnum } from "../lib/constants";
+import { DomainEnum, HTTP_RESPONSE_CODE } from "../lib/constants";
 import { Database } from "./database";
 import { IDomainModel } from "./model";
+import { HttpException } from "../exceptions/exception";
 
 export class DomainRepository extends Database {
   constructor() {
@@ -12,7 +13,10 @@ export class DomainRepository extends Database {
     try {
       const exists: IDomainModel = await this.findOne(name);
       if (exists) {
-        throw new Error("document already exists");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "domain already exists",
+        );
       }
       return await this.prisma.domains.create({
         data: {

@@ -3,6 +3,8 @@ import { IDocumentService } from "../interfaces/document-service.interface";
 import { DocumentService } from "./document-service";
 import { EmbeddingService } from "./embed-service";
 import { IAppService } from "../interfaces/app-service.interface";
+import { HttpException } from "../exceptions/exception";
+import { HTTP_RESPONSE_CODE } from "../lib/constants";
 
 export class AppService extends EmbeddingService implements IAppService {
   constructor(
@@ -18,7 +20,10 @@ export class AppService extends EmbeddingService implements IAppService {
     const documentService: IDocumentService = new DocumentService();
     let text: string;
     if (!this.documentPath.length) {
-      throw new Error("Could not read PDF file");
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        "Could not read PDF file",
+      );
     }
 
     text = await documentService.convertPDFToText(this.documentPath);

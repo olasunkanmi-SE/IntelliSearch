@@ -8,6 +8,7 @@ export class DocumentService implements IDocumentService {
       const dataBuffer = fs.readFileSync(pdfFilePath);
       const data = await pdf(dataBuffer);
       const text = data.text;
+      //format text chunk instead
       const formatedText = this.formatText(text);
       return formatedText;
     } catch (error) {
@@ -76,7 +77,10 @@ export class DocumentService implements IDocumentService {
       .replace(/\[.*?\]/g, "")
       .replace(/<.*?>/g, "")
       .replace(/\\u[\da-f]{4}/g, "")
-      .replace(/\n/g, " ");
+      .replace(/\n/g, " ")
+      .replace(/(?:https?|ftp):\/\/[\n\S]+/g, "")
+      .replace(/[^a-zA-Z0-9\s]/g, "")
+      .trim();
     const lowercaseText = formattedText.toLowerCase();
     const stopWords = [
       "and",

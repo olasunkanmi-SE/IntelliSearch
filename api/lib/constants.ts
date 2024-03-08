@@ -32,3 +32,20 @@ export const enum HttpStatusCode {
 export const APP_ERROR_MESSAGE = {
   serverError: "Something went wrong, try again later",
 };
+
+export enum DocumentTypeEnum {
+  ARTICLE = "ARTICLE",
+  BLOG = "BLOG",
+  RESEARCH_PAPER = "RESEARCH_PAPER",
+  NEWS = "NEWS",
+  TWEET = "TWEET",
+  BOOK = "BOOK",
+}
+
+export enum DomainEnum {
+  FINANCE = "FINANCE",
+  HEALTHCARE = "HEALTHCARE",
+  TECHNOLOGY = "TECHNOLOGY",
+  SPORTS = "SPORTS",
+  COMPUTER_SCIENCE = "COMPUTER_SCIENCE",
+}

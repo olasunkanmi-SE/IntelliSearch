@@ -13,7 +13,7 @@ export class DocumentRepository extends Database {
       if (docExists) {
         throw new Error("document already exists");
       }
-      return await this.prisma.document.create({
+      return await this.prisma.documents.create({
         data: {
           title,
         },
@@ -25,7 +25,7 @@ export class DocumentRepository extends Database {
 
   async findOne(title: string): Promise<IDocumentModel> {
     try {
-      return await this.prisma.document.findFirst({
+      return await this.prisma.documents.findFirst({
         where: {
           title,
         },
@@ -37,7 +37,7 @@ export class DocumentRepository extends Database {
 
   async insertMany(): Promise<Prisma.PrismaPromise<{ count: number }>> {
     try {
-      const result = await this.prisma.document.createMany();
+      const result = await this.prisma.documents.createMany();
       return result.count > 0 ? result : { count: 0 };
     } catch (error) {
       console.error("unable to insert many docs", error);

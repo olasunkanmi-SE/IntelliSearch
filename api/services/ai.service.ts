@@ -10,7 +10,7 @@ export class GenerativeAIService {
   protected generativeAi: GoogleGenerativeAI;
   constructor(
     private apiKey: string,
-    private AIModel: string
+    private AIModel: string,
   ) {
     this.generativeAi = new GoogleGenerativeAI(this.apiKey);
   }

@@ -6,7 +6,7 @@ export const errorMiddleware = (
   error: HttpException,
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const status = error.status ? error.status : 500;
   const message =

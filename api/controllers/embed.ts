@@ -1,6 +1,6 @@
 import express from "express";
 import { documentRequestSchema } from "../lib/validation-schemas";
-import { EmbeddingRepository } from "../repositories/embedding-repository";
+import { EmbeddingRepository } from "../repositories/embedding.repository";
 export class EmbedController {
   path = "/embed";
   router = express.Router();
@@ -15,12 +15,12 @@ export class EmbedController {
   async createDocumentEmbed(
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    next: express.NextFunction,
   ) {
     const embeddingRepository = new EmbeddingRepository();
-    const { title } = documentRequestSchema.parse(req.body);
+    const { title, documentType, domain } = documentRequestSchema.parse(req.body);
     const documentEmbedding =
-      await embeddingRepository.createDocumentAndEmbeddings(title);
+      await embeddingRepository.createDocumentsAndEmbeddings(title, documentType, domain);
     if (documentEmbedding) {
       console.log("success");
     }

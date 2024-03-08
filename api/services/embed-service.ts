@@ -55,7 +55,7 @@ export class EmbeddingService
   async generateEmbeddings(
     text: string,
     taskType: TaskType,
-    role?: string
+    role?: string,
   ): Promise<number[]> {
     if (!Object.values(TaskType).includes(taskType)) {
       throw new Error("Please provide a valid task type");

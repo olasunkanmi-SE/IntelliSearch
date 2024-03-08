@@ -18,9 +18,15 @@ export class EmbedController {
     next: express.NextFunction,
   ) {
     const embeddingRepository = new EmbeddingRepository();
-    const { title, documentType, domain } = documentRequestSchema.parse(req.body);
+    const { title, documentType, domain } = documentRequestSchema.parse(
+      req.body,
+    );
     const documentEmbedding =
-      await embeddingRepository.createDocumentsAndEmbeddings(title, documentType, domain);
+      await embeddingRepository.createDocumentsAndEmbeddings(
+        title,
+        documentType,
+        domain,
+      );
     if (documentEmbedding) {
       console.log("success");
     }

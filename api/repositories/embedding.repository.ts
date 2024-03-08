@@ -10,9 +10,15 @@ import {
 import { DocumentRepository } from "./document.repository";
 import { AppService } from "../services/app.service";
 import { getValue } from "../utils";
-import { AiModels, DocumentTypeEnum, DomainEnum } from "../lib/constants";
+import {
+  AiModels,
+  DocumentTypeEnum,
+  DomainEnum,
+  HTTP_RESPONSE_CODE,
+} from "../lib/constants";
 import { DocumentTypeRepository } from "./document-type.repository";
 import { DomainRepository } from "./domain.repository";
+import { HttpException } from "../exceptions/exception";
 
 export class EmbeddingRepository extends Database {
   constructor() {
@@ -33,7 +39,10 @@ export class EmbeddingRepository extends Database {
         },
       });
       if (!embedding) {
-        throw new Error("Unable to create embedding");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.SERVER_ERROR,
+          "Unable to create embedding",
+        );
       }
       return embedding;
     } catch (error) {
@@ -98,7 +107,10 @@ export class EmbeddingRepository extends Database {
         const documentEmbeddings: { text: string; embeddings?: number[] }[] =
           await appService.createContentEmbeddings();
         if (!documentEmbeddings?.length) {
-          throw new Error("Unable to create document embeddings");
+          throw new HttpException(
+            HTTP_RESPONSE_CODE.BAD_REQUEST,
+            "Unable to create embedding",
+          );
         }
 
         const embeddingModels: IEmbeddingModel[] = this.createEmbeddingModels(
@@ -121,28 +133,42 @@ export class EmbeddingRepository extends Database {
     documentRepositoryType: DocumentTypeRepository,
     documentType: DocumentTypeEnum,
   ): Promise<IDocumentTypeModel> {
-    let docType: IDocumentTypeModel | undefined;
-    if (Object.values(DocumentTypeEnum).includes(documentType)) {
-      docType = await documentRepositoryType.findOne(documentType);
+    try {
+      let docType: IDocumentTypeModel | undefined;
+      if (Object.values(DocumentTypeEnum).includes(documentType)) {
+        docType = await documentRepositoryType.findOne(documentType);
+      }
+      if (!docType) {
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "Document type doesn't exist",
+        );
+      }
+      return docType;
+    } catch (error) {
+      console.error(error)
     }
-    if (!docType) {
-      throw new Error("Document type doesn't exist");
-    }
-    return docType;
   }
 
   private async getDomain(
     domainRepository: DomainRepository,
     domain: DomainEnum,
   ): Promise<IDomainModel> {
-    let docDomain: IDomainModel | undefined;
-    if (Object.values(DomainEnum).includes(domain)) {
-      docDomain = await domainRepository.findOne(domain);
+    try {
+      let docDomain: IDomainModel | undefined;
+      if (Object.values(DomainEnum).includes(domain)) {
+        docDomain = await domainRepository.findOne(domain);
+      }
+      if (!docDomain) {
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "Domain doesn't exist",
+        );
+      }
+      return docDomain;
+    } catch (error) {
+      console.error(error);
     }
-    if (!docDomain) {
-      throw new Error("Domain doesn't exist");
-    }
-    return docDomain;
   }
 
   private createEmbeddingModels(

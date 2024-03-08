@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { Database } from "./database";
 import { IDocumentModel } from "./model";
+import { HttpException } from "../exceptions/exception";
+import { HTTP_RESPONSE_CODE } from "../lib/constants";
 
 export class DocumentRepository extends Database {
   constructor() {
@@ -11,7 +13,10 @@ export class DocumentRepository extends Database {
     try {
       const docExists: IDocumentModel = await this.findOne(title);
       if (docExists) {
-        throw new Error("document already exists");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "document already exists",
+        );
       }
       return await this.prisma.documents.create({
         data: {

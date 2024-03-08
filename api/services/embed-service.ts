@@ -1,6 +1,8 @@
 import { TaskType } from "@google/generative-ai";
 import { IEmbeddingService } from "../interfaces/embedding-service.interface";
 import { GenerativeAIService } from "./ai.service";
+import { HttpException } from "../exceptions/exception";
+import { HTTP_RESPONSE_CODE } from "../lib/constants";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
  * the following roles are commonly used:
@@ -57,16 +59,23 @@ export class EmbeddingService
     taskType: TaskType,
     role?: string,
   ): Promise<number[]> {
-    if (!Object.values(TaskType).includes(taskType)) {
-      throw new Error("Please provide a valid task type");
+    try {
+      if (!Object.values(TaskType).includes(taskType)) {
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "Please provide a valid task type",
+        );
+      }
+      const aiModel = this.generativeModel();
+      const result = await aiModel.embedContent({
+        content: { parts: [{ text }], role: role || "" },
+        taskType,
+      });
+      const embedding = result.embedding;
+      return embedding.values;
+    } catch (error) {
+      console.error(error);
     }
-    const aiModel = this.generativeModel();
-    const result = await aiModel.embedContent({
-      content: { parts: [{ text }], role: role || "" },
-      taskType,
-    });
-    const embedding = result.embedding;
-    return embedding.values;
   }
 
   /**

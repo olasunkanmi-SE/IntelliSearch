@@ -36,7 +36,7 @@ IntelliSearch consists of the following key components:
 To get started with IntelliSearch, follow these steps:
 
 1. Clone the repository:
-   https://github.com/olasunkanmi-SE/Vectorized-Intelligence
+   https://github.com/olasunkanmi-SE/IntelliSearch
    
 2. Install the required dependencies:
    npm i

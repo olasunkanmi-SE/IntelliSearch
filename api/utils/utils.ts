@@ -34,3 +34,16 @@ export async function displayChatTokenCount(
   const msgContent = { role: "user", parts: [{ text: msg }] };
   await displayTokenCount(model, { contents: [...history, msgContent] });
 }
+
+export function generatorValidationError(issue: any) {
+  switch (issue.code) {
+    case "invalid_type":
+      return `Invalid type for field "${issue.path.join(".")}". Expected ${issue.expected}, but received ${issue.received}.`;
+    case "unrecognized_keys":
+      return `Unrecognized field(s): ${issue.keys.join(", ")}.`;
+    case "invalid_enum_value":
+      return `Invalid value for field "${issue.path.join(".")}". Expected one of ${Object.values(issue.options)}, but received ${issue.received}.`;
+    default:
+      return issue.message;
+  }
+}

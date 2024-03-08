@@ -14,7 +14,7 @@ export class DocumentTypeService {
    */
   async getDocumentType(
     documentRepositoryType: DocumentTypeRepository,
-    documentType: DocumentTypeEnum
+    documentType: DocumentTypeEnum,
   ): Promise<IDocumentTypeModel> {
     try {
       let docType: IDocumentTypeModel | undefined;
@@ -22,7 +22,10 @@ export class DocumentTypeService {
         docType = await documentRepositoryType.findOne(documentType);
       }
       if (!docType) {
-        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Document type doesn't exist");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "Document type doesn't exist",
+        );
       }
       return docType;
     } catch (error) {

@@ -9,8 +9,8 @@ export class App {
     private readonly port: number,
   ) {
     this.app = express();
-    this.initControllers(this.controllers);
     this.initMiddlewares();
+    this.initControllers(this.controllers);
     this.intializeErrorHandling();
   }
 

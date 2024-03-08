@@ -73,6 +73,15 @@ export class EmbeddingRepository extends Database {
     }
   }
 
+/**
+ * Creates a new document and generates embeddings for its content.
+ *
+ * @param {string} title - The title of the document.
+ * @param {DocumentTypeEnum} documentType - The type of the document.
+ * @param {DomainEnum} domain - The domain of the document.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the document and embeddings are created successfully, false otherwise.
+ * @throws {Error} - If the document type or domain doesn't exist, or if unable to create document embeddings.
+ */
   async createDocumentsAndEmbeddings(
     title: string,
     documentType: DocumentTypeEnum,
@@ -129,6 +138,14 @@ export class EmbeddingRepository extends Database {
     }
   }
 
+/**
+ * Retrieves the document type model based on the provided document type enum.
+ *
+ * @param {DocumentTypeRepository} documentRepositoryType - The repository for document types.
+ * @param {DocumentTypeEnum} documentType - The document type enum to search for.
+ * @returns {Promise<IDocumentTypeModel>} - A promise that resolves to the document type model.
+ * @throws {Error} - If the document type doesn't exist.
+ */
   private async getDocumentType(
     documentRepositoryType: DocumentTypeRepository,
     documentType: DocumentTypeEnum,
@@ -150,6 +167,14 @@ export class EmbeddingRepository extends Database {
     }
   }
 
+/**
+ * Retrieves the domain model based on the provided domain enum.
+ *
+ * @param {DomainRepository} domainRepository - The repository for domains.
+ * @param {DomainEnum} domain - The domain enum to search for.
+ * @returns {Promise<IDomainModel>} - A promise that resolves to the domain model.
+ * @throws {Error} - If the domain doesn't exist.
+ */
   private async getDomain(
     domainRepository: DomainRepository,
     domain: DomainEnum,
@@ -171,6 +196,15 @@ export class EmbeddingRepository extends Database {
     }
   }
 
+/**
+ * Creates embedding models from the provided document embeddings.
+ *
+ * @param {Array<{ text: string; embeddings?: number[] }>} documentEmbeddings - The document embeddings.
+ * @param {number} documentId - The ID of the associated document.
+ * @param {number} documentTypeId - The ID of the associated document type.
+ * @param {number} domainId - The ID of the associated domain.
+ * @returns {IEmbeddingModel[]} - An array of embedding models.
+ */
   private createEmbeddingModels(
     documentEmbeddings: { text: string; embeddings?: number[] }[],
     documentId: number,

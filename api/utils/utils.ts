@@ -5,6 +5,9 @@ import {
   GenerativeModel,
   Part,
 } from "@google/generative-ai";
+import * as express from "express";
+import { Result } from "../lib/result";
+import { ZodError } from "zod";
 
 export async function streamToStdout(
   stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>,
@@ -46,4 +49,22 @@ export function generatorValidationError(issue: any) {
     default:
       return issue.message;
   }
+}
+
+export function generateErrorResponse(
+  error: any,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  let response;
+  response = res.status(400).json(Result.fail(error.message, 400));
+  if (error instanceof ZodError) {
+    const errorMessage = error.issues
+      .map((issue) => generatorValidationError(issue))
+      .join(" ");
+    response = res.status(400).json(Result.fail(errorMessage, 400));
+  }
+  console.error("An unexpected error occurred:", error);
+  next(error);
+  return response;
 }

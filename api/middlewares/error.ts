@@ -2,9 +2,17 @@ import { NextFunction, Request, Response } from "express";
 import { HttpException } from "../exceptions/exception";
 import { APP_ERROR_MESSAGE } from "../lib/constants";
 
-export const errorMiddleware = (error: HttpException, request: Request, response: Response, next: NextFunction) => {
+export const errorMiddleware = (
+  error: HttpException,
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) => {
   const status = error.status ? error.status : 500;
-  const message = status === 500 ? APP_ERROR_MESSAGE.serverError : error.message;
+  const message =
+    status === 500 ? APP_ERROR_MESSAGE.serverError : error.message;
   const errors = error.error;
-  response.status(status).send({ status, message: JSON.parse(message), error: errors });
+  response
+    .status(status)
+    .send({ status, message: JSON.parse(message), error: errors });
 };

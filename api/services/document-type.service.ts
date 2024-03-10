@@ -13,13 +13,13 @@ export class DocumentTypeService {
    * @throws {Error} - If the document type doesn't exist.
    */
   async getDocumentType(
-    documentRepositoryType: DocumentTypeRepository,
     documentType: DocumentTypeEnum,
   ): Promise<IDocumentTypeModel> {
     try {
       let docType: IDocumentTypeModel | undefined;
+      const documentTypeRepository = new DocumentTypeRepository();
       if (Object.values(DocumentTypeEnum).includes(documentType)) {
-        docType = await documentRepositoryType.findOne(documentType);
+        docType = await documentTypeRepository.findOne(documentType);
       }
       if (!docType) {
         throw new HttpException(

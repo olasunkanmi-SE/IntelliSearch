@@ -27,6 +27,7 @@ export const enum HttpStatusCode {
   BAD_REQUEST = 400,
   SUCCESS = 200,
   UNAUTHORIZED = 401,
+  SERVER_ERROR = 500,
 }
 
 export const APP_ERROR_MESSAGE = {

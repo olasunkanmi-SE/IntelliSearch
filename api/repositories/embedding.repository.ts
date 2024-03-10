@@ -17,10 +17,9 @@ import {
   DomainEnum,
   HTTP_RESPONSE_CODE,
 } from "../lib/constants";
-import { DocumentTypeRepository } from "./document-type.repository";
-import { DomainRepository } from "./domain.repository";
 import { HttpException } from "../exceptions/exception";
 import { DomainService } from "../services/domain.service";
+import { Result } from "../lib/result";
 
 export class EmbeddingRepository extends Database {
   constructor() {
@@ -88,32 +87,26 @@ export class EmbeddingRepository extends Database {
     title: string,
     documentType: DocumentTypeEnum,
     domain: DomainEnum,
-  ): Promise<boolean> {
+  ): Promise<Result<boolean>> {
     try {
       const filePath: string = getValue("PDF_ABSOLUTE_PATH");
       const apiKey: string = getValue("API_KEY");
       const aiModel: string = AiModels.embedding;
 
       const documentRepository: DocumentRepository = new DocumentRepository();
-      const documentRepositoryType: DocumentTypeRepository =
-        new DocumentTypeRepository();
-      const domainRepository: DomainRepository = new DomainRepository();
       const domainService: DomainService = new DomainService();
       const documentTypeService: DocumentTypeService =
         new DocumentTypeService();
-
+      let embeddings: { count: number };
       const appService = new AppService(apiKey, filePath, aiModel);
 
       await this.prisma.$transaction(async (prisma) => {
         const docType: IDocumentTypeModel | undefined =
-          await documentTypeService.getDocumentType(
-            documentRepositoryType,
-            documentType,
-          );
-        const documentTypeId: number = 1;
+          await documentTypeService.getDocumentType(documentType);
+        const documentTypeId: number = docType.id;
 
         const docDomain: IDomainModel | undefined =
-          await domainService.getDomain(domainRepository, domain);
+          await domainService.getDomain(domain);
         const domainId: number = docDomain.id;
 
         const document: IDocumentModel = await documentRepository.create(title);
@@ -136,12 +129,15 @@ export class EmbeddingRepository extends Database {
           domainId,
         );
 
-        await this.insertMany(embeddingModels);
+        embeddings = await this.insertMany(embeddingModels);
       });
-      return true;
+      if (embeddings.count > 0) {
+        return Result.ok<boolean>(true);
+      } else {
+        return Result.fail<boolean>("Unable to create embeddings", 400);
+      }
     } catch (error) {
       console.error(error);
-      return false;
     }
   }
 

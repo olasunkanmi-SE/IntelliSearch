@@ -1,26 +1,26 @@
 import * as express from "express";
-import { IDomainModel } from "../repositories/model";
+import { DocumentTypeHandler } from "../handlers/document-type";
 import { Result } from "../lib/result";
-import { DomainHandler } from "../handlers/domain.handler";
-import { domainRequestSchema } from "../lib/validation-schemas";
+import { docTypeRequestSchema } from "../lib/validation-schemas";
+import { IDomainModel } from "../repositories/model";
 import { ZodError } from "zod";
 import { generatorValidationError } from "../utils/utils";
-export class DomainController {
-  path = "/domain";
+export class DocmentTypeController {
+  path = "/document/type";
   router = express.Router();
   constructor() {
     this.initRoutes();
   }
 
   initRoutes() {
-    this.router.post(`${this.path}/create`, this.createDomain);
+    this.router.post(`${this.path}/create`, this.createDocumentType);
   }
 
-  async createDomain(req: express.Request, res: any, next: express.NextFunction): Promise<Result<IDomainModel>> {
+  async createDocumentType(req: express.Request, res: any, next: express.NextFunction): Promise<Result<IDomainModel>> {
     try {
-      const { name } = domainRequestSchema.parse(req.body);
-      const domainHandler = new DomainHandler();
-      const response = await domainHandler.handle({ name });
+      const { name } = docTypeRequestSchema.parse(req.body);
+      const documentTypeHandler = new DocumentTypeHandler();
+      const response = await documentTypeHandler.handle({ name });
       return res.status(200).json(response);
     } catch (error) {
       if (error instanceof ZodError) {

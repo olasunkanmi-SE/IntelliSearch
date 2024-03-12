@@ -29,9 +29,10 @@ export class EmbeddingController {
         domain,
       });
       if (result.isSuccess) {
-        res.status(200).json(result.getValue());
+        res.status(200).json(result);
       } else {
-        res.status(400).json("Unable to create embeddings");
+        console.log(result);
+        res.status(400).json(result);
       }
     } catch (error) {
       generateErrorResponse(error, res, next);

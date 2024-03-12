@@ -51,20 +51,20 @@ model Documents {
 }
 
 model Embeddings {
-  id             Int            @id @default(autoincrement())
-  textEmbedding  String
+  id             Int                         @id @default(autoincrement())
+  textEmbedding  Unsupported("vector(1536)")
   text           String
   createdBy      String?
   updatedBy      String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime?      @updatedAt
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime?                   @updatedAt
   deletedAt      DateTime?
   deletedBy      String?
   documentId     Int
-  Documents      Documents      @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  DocumentType   DocumentTypes? @relation(fields: [documentTypeId], references: [id])
+  Documents      Documents                   @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  DocumentType   DocumentTypes?              @relation(fields: [documentTypeId], references: [id])
   documentTypeId Int
-  Domain         Domains?       @relation(fields: [domainId], references: [id])
+  Domain         Domains?                    @relation(fields: [domainId], references: [id])
   domainId       Int
 }
 

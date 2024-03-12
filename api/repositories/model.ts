@@ -6,7 +6,7 @@ export interface IDocumentModel extends IAudit {
 export interface IEmbeddingModel extends IAudit {
   id?: number;
   text: string;
-  textEmbedding: string;
+  textEmbedding: number[];
   documentId: number;
   domainId: number;
   documentTypeId: number;

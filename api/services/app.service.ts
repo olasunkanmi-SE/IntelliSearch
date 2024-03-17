@@ -4,26 +4,16 @@ import { DocumentService } from "./document.service";
 import { EmbeddingService } from "./embed.service";
 import { IAppService } from "../interfaces/app-service.interface";
 import { HttpException } from "../exceptions/exception";
-import { HTTP_RESPONSE_CODE } from "../lib/constants";
+import { AiModels, HTTP_RESPONSE_CODE } from "../lib/constants";
+import { getValue } from "../utils";
 
-export class AppService extends EmbeddingService implements IAppService {
-  constructor(
-    apikey: string,
-    private readonly documentPath: string,
-    AIModel: string,
-  ) {
-    super(apikey, AIModel);
-  }
-  async createContentEmbeddings(): Promise<
-    { text: string; embeddings?: number[] }[]
-  > {
+export class AppService implements IAppService {
+  constructor(private readonly documentPath: string) {}
+  async createContentEmbeddings(): Promise<{ text: string; embeddings?: number[] }[]> {
     const documentService: IDocumentService = new DocumentService();
     let text: string;
     if (!this.documentPath.length) {
-      throw new HttpException(
-        HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Could not read PDF file",
-      );
+      throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Could not read PDF file");
     }
     //convert chunks to text instead, incase the file is too large
     text = await documentService.convertPDFToText(this.documentPath);
@@ -33,9 +23,11 @@ export class AppService extends EmbeddingService implements IAppService {
       map.set(index, { text: chunk });
       return map;
     }, new Map<number, { text: string; embeddings?: number[] }>());
-
-    const contentEmbed = chunks.map((chunk) =>
-      this.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context"),
+    const apiKey: string = getValue("API_KEY");
+    const aiModel: string = AiModels.embedding;
+    const embeddingService: EmbeddingService = new EmbeddingService(apiKey, aiModel);
+    const contentEmbed = chunks.map(
+      async (chunk) => await embeddingService.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context")
     );
 
     const embeddings: number[][] = await Promise.all(contentEmbed);

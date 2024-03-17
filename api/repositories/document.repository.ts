@@ -11,6 +11,8 @@ export class DocumentRepository extends Database {
 
   async create(title: string): Promise<IDocumentModel> {
     try {
+      //Todo do not rely on the document title alone, you can concatenate some property called slug and query against that
+      //Or use composite key instead
       const docExists: IDocumentModel = await this.findOne(title);
       if (docExists) {
         throw new HttpException(

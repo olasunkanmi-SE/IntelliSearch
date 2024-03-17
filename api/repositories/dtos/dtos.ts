@@ -5,7 +5,7 @@ export interface ICreateDocumentDTO {
 }
 
 export interface ICreateEmbeddingDTO {
-  text: string;
+  context: string;
   textEmbedding: number[];
   documentId: number;
   domainId: number;

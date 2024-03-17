@@ -5,6 +5,7 @@ import { DocumentTypeEnum, HTTP_RESPONSE_CODE } from "../lib/constants";
 import { HttpException } from "../exceptions/exception";
 
 export class DocumentTypeRepository extends Database {
+  instance: DocumentTypeRepository;
   constructor() {
     super();
   }

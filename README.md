@@ -64,7 +64,6 @@ For detailed installation instructions, configuration options, and usage guideli
 
 We welcome contributions to enhance IntelliSearch and make it even more powerful. If you encounter any issues, have suggestions for improvements, or want to add new features, please open an issue or submit a pull request. Let's collaborate and make IntelliSearch the go-to solution for intelligent question answering and content recommendation!
 
-
+Here is the full architecture:
 <img width="1222" alt="RAG_workflow" src="https://github.com/olasunkanmi-SE/Vectorized-Intelligence/assets/60177090/d1f6495d-8245-400b-ba20-a520c7200950">
 
-<img width="1222" alt="multistep reasoning llm agents by Olasunkanmi Oyinlola" src="https://github.com/olasunkanmi-SE/Vectorized-Intelligence/assets/60177090/364a6174-8e2a-4fee-9ba3-bc8d4d8344b4">

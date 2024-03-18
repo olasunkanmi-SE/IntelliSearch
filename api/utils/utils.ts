@@ -10,7 +10,7 @@ import { Result } from "../lib/result";
 import { ZodError } from "zod";
 
 export async function streamToStdout(
-  stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>,
+  stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>
 ) {
   console.log("Streaming...\n");
   for await (const chunk of stream) {
@@ -22,7 +22,7 @@ export async function streamToStdout(
 
 export async function displayTokenCount(
   model: GenerativeModel,
-  request: string | (string | Part)[] | CountTokensRequest,
+  request: string | (string | Part)[] | CountTokensRequest
 ) {
   const { totalTokens } = await model.countTokens(request);
   console.log("Token count: ", totalTokens);
@@ -31,7 +31,7 @@ export async function displayTokenCount(
 export async function displayChatTokenCount(
   model: GenerativeModel,
   chat: ChatSession,
-  msg: string,
+  msg: string
 ) {
   const history = await chat.getHistory();
   const msgContent = { role: "user", parts: [{ text: msg }] };
@@ -54,7 +54,7 @@ export function generatorValidationError(issue: any) {
 export function generateErrorResponse(
   error: any,
   res: express.Response,
-  next: express.NextFunction,
+  next: express.NextFunction
 ) {
   let response;
   response = res.status(400).json(Result.fail(error.message, 400));

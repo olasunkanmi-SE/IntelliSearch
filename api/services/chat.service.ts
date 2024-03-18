@@ -6,11 +6,12 @@ import {
 } from "@google/generative-ai";
 import { oneLine, stripIndents } from "common-tags";
 import { GenerativeAIService } from "./ai.service";
+import { AiModels } from "../lib/constants";
 
 export class Chat extends GenerativeAIService {
   initialConvo: any;
-  constructor(apiKey: string, AIModel: string) {
-    super(apiKey, AIModel);
+  constructor(apiKey: string) {
+    super(apiKey);
     this.initChat();
   }
 
@@ -35,7 +36,8 @@ export class Chat extends GenerativeAIService {
         maxOutputTokens: 100,
       },
     };
-    const model = await this.generativeModel();
+    const aiModel = AiModels.gemini;
+    const model = await this.generativeModel(aiModel);
     return await model.startChat(this.initialConvo);
   };
   async run() {
@@ -77,9 +79,10 @@ export class Chat extends GenerativeAIService {
   }
 
   displayTokenCount = async (
-    request: string | (string | Part)[] | CountTokensRequest,
+    request: string | (string | Part)[] | CountTokensRequest
   ) => {
-    const model = await this.generativeModel();
+    const aiModel = AiModels.gemini;
+    const model = this.generativeModel(aiModel);
     const { totalTokens } = await model.countTokens(request);
     console.log("Token count", totalTokens);
   };
@@ -92,7 +95,7 @@ export class Chat extends GenerativeAIService {
   };
 
   streamToStdout = async (
-    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>,
+    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>
   ) => {
     console.log("Streaming...\n");
     for await (const chunk of stream) {

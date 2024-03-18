@@ -1,5 +1,5 @@
 import * as express from "express";
-import { EmbeddingHandler } from "../handlers/embed.handler";
+import { CreateDocumentEmbeddingHandler } from "../handlers/create-document-embed.handler";
 import { documentRequestSchema } from "../lib/validation-schemas";
 import { generateErrorResponse } from "../utils/utils";
 import { Result } from "../lib/result";
@@ -14,10 +14,17 @@ export class EmbeddingController {
     this.router.post(`${this.path}/documents`, this.createDocumentEmbeddings);
   }
 
-  async createDocumentEmbeddings(req: express.Request, res: express.Response, next: express.NextFunction) {
-    const embeddingHandler: EmbeddingHandler = new EmbeddingHandler();
+  async createDocumentEmbeddings(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    const embeddingHandler: CreateDocumentEmbeddingHandler =
+      new CreateDocumentEmbeddingHandler();
     try {
-      const { title, documentType, domain } = documentRequestSchema.parse(req.body);
+      const { title, documentType, domain } = documentRequestSchema.parse(
+        req.body
+      );
       const result = await embeddingHandler.handle({
         title,
         documentType,

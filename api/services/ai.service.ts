@@ -8,16 +8,13 @@ import { modelConfig } from "../lib/constants";
 export class GenerativeAIService {
   private config: GenerationConfig = modelConfig;
   protected generativeAi: GoogleGenerativeAI;
-  constructor(
-    private apiKey: string,
-    private AIModel: string,
-  ) {
+  constructor(private apiKey: string) {
     this.generativeAi = new GoogleGenerativeAI(this.apiKey);
   }
 
-  generativeModel(): GenerativeModel {
+  generativeModel(aiModel: string): GenerativeModel {
     const model = this.generativeAi.getGenerativeModel({
-      model: this.AIModel,
+      model: aiModel,
       generationConfig: this.config,
     });
     return model;

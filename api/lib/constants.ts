@@ -1,6 +1,6 @@
 export const AiModels = {
   embedding: "embedding-001",
-  chat: "gemini-pro",
+  gemini: "gemini-pro",
 };
 
 export const modelConfig = {

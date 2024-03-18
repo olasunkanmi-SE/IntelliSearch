@@ -3,10 +3,14 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 
 export class Database {
   private static instance: Database;
-  protected prisma: PrismaClient<Prisma.PrismaClientOptions, { log: "info" }, DefaultArgs>;
+  protected prisma: PrismaClient<
+    Prisma.PrismaClientOptions,
+    { log: "info" },
+    DefaultArgs
+  >;
   constructor() {
     this.prisma = new PrismaClient();
-    this.createIvfflatIndex();
+    // this.createIvfflatIndex();
   }
 
   /**

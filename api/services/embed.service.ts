@@ -1,16 +1,31 @@
-import { TaskType } from "@google/generative-ai";
+import {
+  EnhancedGenerateContentResponse,
+  GenerateContentResult,
+  GenerativeModel,
+  TaskType,
+} from "@google/generative-ai";
 import { HttpException } from "../exceptions/exception";
+import { IDocumentService } from "../interfaces/document-service.interface";
 import { IEmbeddingService } from "../interfaces/embedding-service.interface";
 import { ICreateEmbedding } from "../interfaces/generic-interface";
-import { AiModels, DocumentTypeEnum, DomainEnum, HTTP_RESPONSE_CODE } from "../lib/constants";
+import {
+  AiModels,
+  DocumentTypeEnum,
+  DomainEnum,
+  HTTP_RESPONSE_CODE,
+} from "../lib/constants";
 import { Result } from "../lib/result";
 import { DocumentRepository } from "../repositories/document.repository";
-import { IDocumentModel, IDocumentTypeModel, IDomainModel } from "../repositories/model";
+import {
+  IDocumentModel,
+  IDocumentTypeModel,
+  IDomainModel,
+} from "../repositories/model";
 import { getValue } from "../utils";
 import { EmbeddingRepository } from "./../repositories/embedding.repository";
 import { GenerativeAIService } from "./ai.service";
-import { AppService } from "./app.service";
 import { DocumentTypeService } from "./document-type.service";
+import { DocumentService } from "./document.service";
 import { DomainService } from "./domain.service";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
@@ -52,20 +67,32 @@ A typical use case for the `RETRIEVAL_DOCUMENT` task type is embedding documents
 of information. For example, you could use this task type to embed articles, FAQs, 
 or product manuals to create a searchable knowledge base for customer support or information retrieval systems.*/
 
-export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
+export class EmbeddingService
+  extends GenerativeAIService
+  implements IEmbeddingService
+{
+  documentPath: string = getValue("PDF_ABSOLUTE_PATH");
   constructor(apiKey: string, AIModel: string) {
-    super(apiKey, AIModel);
+    super(apiKey);
   }
   /**
    * Generates embeddings for the given text using the generative model.
    * @returns The embedding generated for the text.
    */
-  async generateEmbeddings(text: string, taskType: TaskType, role?: string): Promise<number[]> {
+  async generateEmbeddings(
+    text: string,
+    taskType: TaskType,
+    role?: string
+  ): Promise<number[]> {
     try {
       if (!Object.values(TaskType).includes(taskType)) {
-        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Please provide a valid task type");
+        throw new HttpException(
+          HTTP_RESPONSE_CODE.BAD_REQUEST,
+          "Please provide a valid task type"
+        );
       }
-      const aiModel = this.generativeModel();
+      const model = AiModels.embedding;
+      const aiModel = this.generativeModel(model);
       const result = await aiModel.embedContent({
         content: { parts: [{ text }], role: role || "" },
         taskType,
@@ -136,15 +163,16 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     domain: DomainEnum
   ): Promise<Result<boolean>> {
     try {
-      const filePath: string = getValue("PDF_ABSOLUTE_PATH");
       const documentRepository: DocumentRepository = new DocumentRepository();
       const domainService: DomainService = new DomainService();
-      const documentTypeService: DocumentTypeService = new DocumentTypeService();
-      const appService = new AppService(filePath);
-      const docType: IDocumentTypeModel | undefined = await documentTypeService.getDocumentType(documentType);
+      const documentTypeService: DocumentTypeService =
+        new DocumentTypeService();
+      const docType: IDocumentTypeModel | undefined =
+        await documentTypeService.getDocumentType(documentType);
       const documentTypeId: number = docType.id;
 
-      const docDomain: IDomainModel | undefined = await domainService.getDomain(domain);
+      const docDomain: IDomainModel | undefined =
+        await domainService.getDomain(domain);
       const domainId: number = docDomain.id;
       const document: IDocumentModel = await documentRepository.create(title);
       let documentId: number;
@@ -152,9 +180,12 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
       if (document) {
         documentId = document.id;
         const documentEmbeddings: { text: string; embeddings?: number[] }[] =
-          await appService.createContentEmbeddings();
+          await this.createContentEmbeddings();
         if (!documentEmbeddings?.length) {
-          throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to create embedding");
+          throw new HttpException(
+            HTTP_RESPONSE_CODE.BAD_REQUEST,
+            "Unable to create embedding"
+          );
         }
         const data: ICreateEmbedding = {
           documentEmbeddings,
@@ -162,13 +193,65 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
           documentTypeId,
           domainId,
         };
-        const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
-        const response = await embeddingRepository.createDocumentEmbeddings(data);
+        const embeddingRepository: EmbeddingRepository =
+          new EmbeddingRepository();
+        const response =
+          await embeddingRepository.createDocumentEmbeddings(data);
         const result = response.getValue();
         return Result.ok(result);
       }
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async createContentEmbeddings(): Promise<
+    { text: string; embeddings?: number[] }[]
+  > {
+    const documentService: IDocumentService = new DocumentService();
+    let text: string;
+    if (!this.documentPath.length) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        "Could not read PDF file"
+      );
+    }
+    text = await documentService.convertPDFToText(this.documentPath);
+    const chunks: string[] = documentService.breakTextIntoChunks(text, 4000);
+
+    const textMap = chunks.reduce((map, chunk, index) => {
+      map.set(index, { text: chunk });
+      return map;
+    }, new Map<number, { text: string; embeddings?: number[] }>());
+    const contentEmbed = chunks.map(
+      async (chunk) =>
+        await this.generateEmbeddings(
+          chunk,
+          TaskType.RETRIEVAL_DOCUMENT,
+          "context"
+        )
+    );
+
+    const embeddings: number[][] = await Promise.all(contentEmbed);
+
+    if (embeddings?.length) {
+      embeddings.forEach((embedding, i) => {
+        if (textMap.has(i)) {
+          textMap.set(i, { ...textMap.get(i), embeddings: embedding });
+        }
+      });
+      return [...textMap.values()];
+    }
+  }
+
+  async generateSimilarQueries(query: string): Promise<string> {
+    const model = AiModels.gemini;
+    const aiModel: GenerativeModel = this.generativeModel(model);
+    const prompt = `Generate 5 additional queries that are similar to this query: ${query}`;
+    const result: GenerateContentResult = await aiModel.generateContent(prompt);
+    const response: EnhancedGenerateContentResponse = result.response;
+    const text: string = response.text();
+    console.log(text);
+    return text;
   }
 }

@@ -11,7 +11,8 @@ export class EmbeddingRepository extends Database {
 
   async create(props: ICreateEmbeddingDTO): Promise<number> {
     try {
-      const { context, textEmbedding, documentId, domainId, documentTypeId } = props;
+      const { context, textEmbedding, documentId, domainId, documentTypeId } =
+        props;
       const embedding = await this.prisma.$executeRaw`
         INSERT INTO "Embeddings" (
           "context",
@@ -59,7 +60,9 @@ export class EmbeddingRepository extends Database {
     try {
       return await this.prisma.$transaction(async (prisma) => {
         let transactionCount = 0;
-        const embeddings: Promise<number>[] = props.map((prop) => this.create(prop));
+        const embeddings: Promise<number>[] = props.map((prop) =>
+          this.create(prop)
+        );
         const allPromise: number[] = await Promise.all(embeddings);
         if (allPromise.length) {
           transactionCount = allPromise.length;
@@ -82,22 +85,22 @@ export class EmbeddingRepository extends Database {
    * @returns {Promise<boolean>} - A promise that resolves to true if the document and embeddings are created successfully, false otherwise.
    * @throws {Error} - If the document type or domain doesn't exist, or if unable to create document embeddings.
    */
-  async createDocumentEmbeddings(data: ICreateEmbedding): Promise<Result<boolean>> {
+  async createDocumentEmbeddings(
+    data: ICreateEmbedding
+  ): Promise<Result<boolean>> {
     try {
       let response = Result.ok<boolean>(true);
-      const embeddingsHasData = await this.prisma.embeddings.findFirst();
 
       await this.prisma.$transaction(async (prisma) => {
-        if (embeddingsHasData) {
-          await this.createIvfflatIndex();
-        }
-        const { documentEmbeddings, documentId, documentTypeId, domainId } = data;
-        const embeddingModels: IEmbeddingModel[] = this.createEmbeddingModelMapper(
-          documentEmbeddings,
-          documentId,
-          documentTypeId,
-          domainId
-        );
+        const { documentEmbeddings, documentId, documentTypeId, domainId } =
+          data;
+        const embeddingModels: IEmbeddingModel[] =
+          this.createEmbeddingModelMapper(
+            documentEmbeddings,
+            documentId,
+            documentTypeId,
+            domainId
+          );
         const embeddings = await this.insertMany(embeddingModels);
         if (embeddings?.count < 1) {
           response = Result.fail<boolean>("Unable to create embeddings", 400);
@@ -136,7 +139,11 @@ export class EmbeddingRepository extends Database {
   /**
    * Queries the database for listings that are similar to a given embedding.
    */
-  async queryDocumentsBySimilarity(embedding: string, matchThreshold: number, matchCnt: number) {
+  async queryDocumentsBySimilarity(
+    embedding: string,
+    matchThreshold: number,
+    matchCnt: number
+  ) {
     //change text to document_embedding
     const listings = await this.prisma.$queryRaw`
         SELECT 

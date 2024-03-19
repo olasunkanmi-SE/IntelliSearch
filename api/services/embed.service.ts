@@ -7,7 +7,7 @@ import {
 import { HttpException } from "../exceptions/exception";
 import { IDocumentService } from "../interfaces/document-service.interface";
 import { IEmbeddingService } from "../interfaces/embedding-service.interface";
-import { ICreateEmbedding } from "../interfaces/generic-interface";
+import { ICreateEmbedding, IQueryMatch } from "../interfaces/generic-interface";
 import {
   AiModels,
   DocumentTypeEnum,
@@ -82,7 +82,7 @@ export class EmbeddingService
   async generateEmbeddings(
     text: string,
     taskType: TaskType,
-    role?: string
+    role?: string,
   ): Promise<{
     embedding: number[];
     text: string;
@@ -91,7 +91,7 @@ export class EmbeddingService
       if (!Object.values(TaskType).includes(taskType)) {
         throw new HttpException(
           HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "Please provide a valid task type"
+          "Please provide a valid task type",
         );
       }
       const model = AiModels.embedding;
@@ -167,10 +167,10 @@ export class EmbeddingService
   async createDocumentsEmbeddings(
     title: string,
     documentType: DocumentTypeEnum,
-    domain: DomainEnum
+    domain: DomainEnum,
   ): Promise<Result<boolean>> {
     try {
-      this.getContexts("can you summarize this white paper ?");
+      this.reRankQueryMatches();
       const documentRepository: DocumentRepository = new DocumentRepository();
       const domainService: DomainService = new DomainService();
       const documentTypeService: DocumentTypeService =
@@ -192,7 +192,7 @@ export class EmbeddingService
         if (!documentEmbeddings?.length) {
           throw new HttpException(
             HTTP_RESPONSE_CODE.BAD_REQUEST,
-            "Unable to create embedding"
+            "Unable to create embedding",
           );
         }
         const data: ICreateEmbedding = {
@@ -221,7 +221,7 @@ export class EmbeddingService
     if (!this.documentPath.length) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Could not read PDF file"
+        "Could not read PDF file",
       );
     }
     text = await documentService.convertPDFToText(this.documentPath);
@@ -232,8 +232,8 @@ export class EmbeddingService
         await this.generateEmbeddings(
           chunk,
           TaskType.RETRIEVAL_DOCUMENT,
-          "context"
-        )
+          "context",
+        ),
     );
 
     const textEmbeddings: {
@@ -259,10 +259,11 @@ export class EmbeddingService
     if (!queries?.length) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Unable to generate similar queries"
+        "Unable to generate similar queries",
       );
     }
     const queriesArray = queries.split("\n");
+    console.log(queriesArray);
     const embeddingPromise = queriesArray.map((query) => {
       return this.generateEmbeddings(query, TaskType.RETRIEVAL_QUERY, "query");
     });
@@ -270,27 +271,67 @@ export class EmbeddingService
     return embeddings.map((e) => e.embedding);
   }
 
-  async getContexts(query: string) {
+  async getQueryMatches(
+    query: string,
+    matchCount: number,
+    similarityThreshold: number,
+  ): Promise<IQueryMatch[]> {
     const queryEmbeddings = await this.generateUserQueryEmbeddings(query);
     if (!queryEmbeddings?.length) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Unable to generate user query embeddings"
+        "Unable to generate user query embeddings",
       );
     }
     const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
-
-    const matches0: any = await embeddingRepository.matchDocuments(
-      queryEmbeddings[0],
-      5,
-      0.6
-    );
-    const matches1: any = await embeddingRepository.matchDocuments(
-      queryEmbeddings[1],
-      5,
-      0.6
-    );
-    const matches = [...matches0, ...matches1];
+    const [firstEmbeddings, secondEmbeddings, thirdEmbeddings] =
+      queryEmbeddings;
+    //Check if this works with map and promise.all
+    const originalQuery: IQueryMatch[] =
+      await embeddingRepository.matchDocuments(
+        firstEmbeddings,
+        matchCount,
+        similarityThreshold,
+      );
+    const intialAiGenratedQuery: IQueryMatch[] =
+      await embeddingRepository.matchDocuments(
+        secondEmbeddings,
+        matchCount,
+        similarityThreshold,
+      );
+    const otherAiGenratedQuery: IQueryMatch[] =
+      await embeddingRepository.matchDocuments(
+        thirdEmbeddings,
+        matchCount,
+        similarityThreshold,
+      );
+    const matches: IQueryMatch[] = [
+      ...originalQuery,
+      ...intialAiGenratedQuery,
+      ...otherAiGenratedQuery,
+    ];
     return matches;
+  }
+
+  async reRankQueryMatches() {
+    const matches = await this.getQueryMatches(
+      "Which Surah talk about fasting",
+      4,
+      0.6,
+    );
+    if (!matches?.length) {
+      return "No matches for user query";
+    }
+    const similarityMatches = matches.map(({ context, textEmbedding }) => {
+      const cosineSimilarity = this.cosineSimilarity(
+        textEmbedding,
+        matches[0].textEmbedding,
+      );
+      return { similarity: cosineSimilarity, context };
+    });
+    const sorted = similarityMatches.toSorted(
+      (a, b) => b.similarity - a.similarity,
+    );
+    return sorted.slice(0, 5);
   }
 }

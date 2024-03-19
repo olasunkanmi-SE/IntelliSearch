@@ -17,12 +17,12 @@ export class CreateDocumentEmbeddingHandler
       const result = await embeddingService.createDocumentsEmbeddings(
         title,
         documentType,
-        domain
+        domain,
       );
       if (!result) {
         throw new HttpException(
           HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "An error occured, could not create embeddings"
+          "An error occured, could not create embeddings",
         );
       }
       return result;

@@ -79,7 +79,7 @@ export class Chat extends GenerativeAIService {
   }
 
   displayTokenCount = async (
-    request: string | (string | Part)[] | CountTokensRequest
+    request: string | (string | Part)[] | CountTokensRequest,
   ) => {
     const aiModel = AiModels.gemini;
     const model = this.generativeModel(aiModel);
@@ -95,7 +95,7 @@ export class Chat extends GenerativeAIService {
   };
 
   streamToStdout = async (
-    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>
+    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>,
   ) => {
     console.log("Streaming...\n");
     for await (const chunk of stream) {

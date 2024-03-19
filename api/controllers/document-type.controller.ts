@@ -17,7 +17,7 @@ export class DocmentTypeController {
   async createDocumentType(
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    next: express.NextFunction,
   ) {
     try {
       const { name } = docTypeRequestSchema.parse(req.body);

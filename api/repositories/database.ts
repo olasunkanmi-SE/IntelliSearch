@@ -10,7 +10,7 @@ export class Database {
   >;
   constructor() {
     this.prisma = new PrismaClient();
-    // this.createIvfflatIndex();
+    this.createIvfflatIndex();
   }
 
   /**

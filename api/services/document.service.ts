@@ -37,7 +37,7 @@ export class DocumentService implements IDocumentService {
       let chunk = text.substring(startIndex, chunkSize);
       //check if the chunck doesn't ends with "-", en dash "–", and em dash "—" and whitspace
       const characterNotAtTheEndOfChunk: boolean = !/\s[---]/.test(
-        text[chunkSize - 1]
+        text[chunkSize - 1],
       );
       if (characterNotAtTheEndOfChunk) {
         chunk = this.adjustChunkToEndAtCharacter(chunk);
@@ -54,7 +54,7 @@ export class DocumentService implements IDocumentService {
     const lastDashIndex = Math.max(
       chunk.lastIndexOf("-"),
       chunk.lastIndexOf("–"),
-      chunk.lastIndexOf("—")
+      chunk.lastIndexOf("—"),
     );
     const breakIndex = Math.max(lastSpaceIndex, lastDashIndex);
     //Recreate the chunck based on the next break

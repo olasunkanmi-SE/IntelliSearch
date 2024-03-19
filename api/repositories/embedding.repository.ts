@@ -1,4 +1,4 @@
-import { ICreateEmbedding } from "../interfaces/generic-interface";
+import { ICreateEmbedding, IQueryMatch } from "../interfaces/generic-interface";
 import { Result } from "../lib/result";
 import { Database } from "./database";
 import { ICreateEmbeddingDTO } from "./dtos/dtos";
@@ -61,7 +61,7 @@ export class EmbeddingRepository extends Database {
       return await this.prisma.$transaction(async (prisma) => {
         let transactionCount = 0;
         const embeddings: Promise<number>[] = props.map((prop) =>
-          this.createEmbedding(prop)
+          this.createEmbedding(prop),
         );
         const allPromise: number[] = await Promise.all(embeddings);
         if (allPromise.length) {
@@ -86,7 +86,7 @@ export class EmbeddingRepository extends Database {
    * @throws {Error} - If the document type or domain doesn't exist, or if unable to create document embeddings.
    */
   async createDocumentEmbeddings(
-    data: ICreateEmbedding
+    data: ICreateEmbedding,
   ): Promise<Result<boolean>> {
     try {
       let response = Result.ok<boolean>(true);
@@ -99,7 +99,7 @@ export class EmbeddingRepository extends Database {
             documentEmbeddings,
             documentId,
             documentTypeId,
-            domainId
+            domainId,
           );
         const embeddings = await this.insertMany(embeddingModels);
         if (embeddings?.count < 1) {
@@ -125,7 +125,7 @@ export class EmbeddingRepository extends Database {
     documentEmbeddings: { text: string; embedding?: number[] }[],
     documentId: number,
     documentTypeId: number,
-    domainId: number
+    domainId: number,
   ): IEmbeddingModel[] {
     return documentEmbeddings.map((doc) => ({
       textEmbedding: doc.embedding,
@@ -141,13 +141,15 @@ export class EmbeddingRepository extends Database {
    */
   async matchDocuments(
     embedding: any,
-    matchCnt: number,
-    matchThreshold: number
-  ) {
+    matchCount: number,
+    matchThreshold: number,
+  ): Promise<IQueryMatch[]> {
     //change text to document_embedding
-    const listings = await this.prisma.$queryRaw`
+    //check how to select textembedding from DB
+    const matches = await this.prisma.$queryRaw`
         SELECT 
         context,
+        "textEmbedding",
             1 - ("textEmbedding" <=> ${embedding}::vector) as similarity
         FROM 
             "Embeddings"
@@ -156,8 +158,8 @@ export class EmbeddingRepository extends Database {
         ORDER BY 
             similarity DESC
         LIMIT 
-            ${matchCnt};
+            ${matchCount};
     `;
-    return listings;
+    return matches as IQueryMatch[];
   }
 }

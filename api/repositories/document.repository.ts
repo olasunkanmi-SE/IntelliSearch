@@ -13,6 +13,8 @@ export class DocumentRepository extends Database {
     try {
       //Todo do not rely on the document title alone, you can concatenate some property called slug and query against that
       //Or use composite key instead
+      //Try out https://github.com/robbie-cahill/tunnelmole-client for locally running http server
+      //In your instructiona prompt, ask the AI to genrate code if any is available
       const docExists: IDocumentModel = await this.findOne(title);
       if (docExists) {
         throw new HttpException(

@@ -9,7 +9,7 @@ export class EmbeddingRepository extends Database {
     super();
   }
 
-  async create(props: ICreateEmbeddingDTO): Promise<number> {
+  async createEmbedding(props: ICreateEmbeddingDTO): Promise<number> {
     try {
       const { context, textEmbedding, documentId, domainId, documentTypeId } =
         props;
@@ -61,7 +61,7 @@ export class EmbeddingRepository extends Database {
       return await this.prisma.$transaction(async (prisma) => {
         let transactionCount = 0;
         const embeddings: Promise<number>[] = props.map((prop) =>
-          this.create(prop)
+          this.createEmbedding(prop)
         );
         const allPromise: number[] = await Promise.all(embeddings);
         if (allPromise.length) {
@@ -122,13 +122,13 @@ export class EmbeddingRepository extends Database {
    * @returns {IEmbeddingModel[]} - An array of embedding models.
    */
   private createEmbeddingModelMapper(
-    documentEmbeddings: { text: string; embeddings?: number[] }[],
+    documentEmbeddings: { text: string; embedding?: number[] }[],
     documentId: number,
     documentTypeId: number,
     domainId: number
   ): IEmbeddingModel[] {
     return documentEmbeddings.map((doc) => ({
-      textEmbedding: doc.embeddings,
+      textEmbedding: doc.embedding,
       context: doc.text,
       documentId,
       documentTypeId,
@@ -139,20 +139,20 @@ export class EmbeddingRepository extends Database {
   /**
    * Queries the database for listings that are similar to a given embedding.
    */
-  async queryDocumentsBySimilarity(
-    embedding: string,
-    matchThreshold: number,
-    matchCnt: number
+  async matchDocuments(
+    embedding: any,
+    matchCnt: number,
+    matchThreshold: number
   ) {
     //change text to document_embedding
     const listings = await this.prisma.$queryRaw`
         SELECT 
-            text,
-            1 - (document_embedding <=> ${embedding}) as similarity
+        context,
+            1 - ("textEmbedding" <=> ${embedding}::vector) as similarity
         FROM 
-            Embeddings
+            "Embeddings"
         WHERE 
-            1 - (document_embedding <=> ${embedding}) > ${matchThreshold}
+            1 - ("textEmbedding" <=> ${embedding}::vector) > ${matchThreshold}
         ORDER BY 
             similarity DESC
         LIMIT 

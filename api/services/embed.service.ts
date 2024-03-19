@@ -72,7 +72,7 @@ export class EmbeddingService
   implements IEmbeddingService
 {
   documentPath: string = getValue("PDF_ABSOLUTE_PATH");
-  constructor(apiKey: string, AIModel: string) {
+  constructor(apiKey: string) {
     super(apiKey);
   }
   /**
@@ -83,7 +83,10 @@ export class EmbeddingService
     text: string,
     taskType: TaskType,
     role?: string
-  ): Promise<number[]> {
+  ): Promise<{
+    embedding: number[];
+    text: string;
+  }> {
     try {
       if (!Object.values(TaskType).includes(taskType)) {
         throw new HttpException(
@@ -98,7 +101,11 @@ export class EmbeddingService
         taskType,
       });
       const embedding = result.embedding;
-      return embedding.values;
+      const data = {
+        embedding: embedding.values,
+        text,
+      };
+      return data;
     } catch (error) {
       console.error(error);
     }
@@ -163,6 +170,7 @@ export class EmbeddingService
     domain: DomainEnum
   ): Promise<Result<boolean>> {
     try {
+      this.getContexts("can you summarize this white paper ?");
       const documentRepository: DocumentRepository = new DocumentRepository();
       const domainService: DomainService = new DomainService();
       const documentTypeService: DocumentTypeService =
@@ -217,12 +225,8 @@ export class EmbeddingService
       );
     }
     text = await documentService.convertPDFToText(this.documentPath);
-    const chunks: string[] = documentService.breakTextIntoChunks(text, 4000);
+    const chunks: string[] = documentService.breakTextIntoChunks(text, 2000);
 
-    const textMap = chunks.reduce((map, chunk, index) => {
-      map.set(index, { text: chunk });
-      return map;
-    }, new Map<number, { text: string; embeddings?: number[] }>());
     const contentEmbed = chunks.map(
       async (chunk) =>
         await this.generateEmbeddings(
@@ -232,26 +236,61 @@ export class EmbeddingService
         )
     );
 
-    const embeddings: number[][] = await Promise.all(contentEmbed);
+    const textEmbeddings: {
+      embedding: number[];
+      text: string;
+    }[] = await Promise.all(contentEmbed);
 
-    if (embeddings?.length) {
-      embeddings.forEach((embedding, i) => {
-        if (textMap.has(i)) {
-          textMap.set(i, { ...textMap.get(i), embeddings: embedding });
-        }
-      });
-      return [...textMap.values()];
-    }
+    return textEmbeddings;
   }
 
   async generateSimilarQueries(query: string): Promise<string> {
     const model = AiModels.gemini;
     const aiModel: GenerativeModel = this.generativeModel(model);
-    const prompt = `Generate 5 additional queries that are similar to this query: ${query}`;
+    const prompt = `Generate 2 additional comma seperated queries that are similar to this query and append the original query too: ${query}`;
     const result: GenerateContentResult = await aiModel.generateContent(prompt);
     const response: EnhancedGenerateContentResponse = result.response;
     const text: string = response.text();
-    console.log(text);
     return text;
+  }
+
+  async generateUserQueryEmbeddings(query: string): Promise<number[][]> {
+    const queries = await this.generateSimilarQueries(query);
+    if (!queries?.length) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        "Unable to generate similar queries"
+      );
+    }
+    const queriesArray = queries.split("\n");
+    const embeddingPromise = queriesArray.map((query) => {
+      return this.generateEmbeddings(query, TaskType.RETRIEVAL_QUERY, "query");
+    });
+    const embeddings = await Promise.all(embeddingPromise);
+    return embeddings.map((e) => e.embedding);
+  }
+
+  async getContexts(query: string) {
+    const queryEmbeddings = await this.generateUserQueryEmbeddings(query);
+    if (!queryEmbeddings?.length) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        "Unable to generate user query embeddings"
+      );
+    }
+    const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
+
+    const matches0: any = await embeddingRepository.matchDocuments(
+      queryEmbeddings[0],
+      5,
+      0.6
+    );
+    const matches1: any = await embeddingRepository.matchDocuments(
+      queryEmbeddings[1],
+      5,
+      0.6
+    );
+    const matches = [...matches0, ...matches1];
+    return matches;
   }
 }

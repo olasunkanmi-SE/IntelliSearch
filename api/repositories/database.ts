@@ -33,7 +33,6 @@ export class Database {
                  USING ivfflat ("textEmbedding" vector_cosine_ops) 
                  WITH (lists = 100);
           `;
-        console.log("Ivfflat index created successfully.");
       }
     } catch (error) {
       console.error("Error creating index or extension", error);

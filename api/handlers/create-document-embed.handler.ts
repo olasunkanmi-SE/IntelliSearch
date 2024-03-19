@@ -1,6 +1,6 @@
 import { HttpException } from "../exceptions/exception";
 import { IRequestHandler } from "../interfaces/handler";
-import { AiModels, HTTP_RESPONSE_CODE } from "../lib/constants";
+import { HTTP_RESPONSE_CODE } from "../lib/constants";
 import { Result } from "../lib/result";
 import { ICreateEmbeddingRequestDTO } from "../repositories/dtos/dtos";
 import { EmbeddingService } from "../services/embed.service";
@@ -13,11 +13,7 @@ export class CreateDocumentEmbeddingHandler
     try {
       const { title, documentType, domain } = request;
       const apiKey: string = getValue("API_KEY");
-      const aiModel: string = AiModels.embedding;
-      const embeddingService: EmbeddingService = new EmbeddingService(
-        apiKey,
-        aiModel
-      );
+      const embeddingService: EmbeddingService = new EmbeddingService(apiKey);
       const result = await embeddingService.createDocumentsEmbeddings(
         title,
         documentType,

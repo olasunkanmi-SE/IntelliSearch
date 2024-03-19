@@ -7,10 +7,8 @@ export class DocumentService implements IDocumentService {
     try {
       const dataBuffer = fs.readFileSync(pdfFilePath);
       const data = await pdf(dataBuffer);
-      const text = data.text;
-      //format text chunk instead
-      const formatedText = this.formatText(text);
-      return formatedText;
+      const text = this.formatText(data.text);
+      return text;
     } catch (error) {
       console.error("Error while converting pdf to text", error);
     }
@@ -39,7 +37,7 @@ export class DocumentService implements IDocumentService {
       let chunk = text.substring(startIndex, chunkSize);
       //check if the chunck doesn't ends with "-", en dash "–", and em dash "—" and whitspace
       const characterNotAtTheEndOfChunk: boolean = !/\s[---]/.test(
-        text[chunkSize - 1],
+        text[chunkSize - 1]
       );
       if (characterNotAtTheEndOfChunk) {
         chunk = this.adjustChunkToEndAtCharacter(chunk);
@@ -56,7 +54,7 @@ export class DocumentService implements IDocumentService {
     const lastDashIndex = Math.max(
       chunk.lastIndexOf("-"),
       chunk.lastIndexOf("–"),
-      chunk.lastIndexOf("—"),
+      chunk.lastIndexOf("—")
     );
     const breakIndex = Math.max(lastSpaceIndex, lastDashIndex);
     //Recreate the chunck based on the next break
@@ -73,37 +71,18 @@ export class DocumentService implements IDocumentService {
    */
   formatText = (text: string): string => {
     const formattedText = text
-      .replace(/(\\*|\\_)/g, " ")
+      .replace(/(\\*|\\_)/g, "")
       .replace(/\[.*?\]/g, "")
       .replace(/<.*?>/g, "")
       .replace(/\\u[\da-f]{4}/g, "")
-      .replace(/\n/g, " ")
+      .replace(/\n/g, "")
       .replace(/(?:https?|ftp):\/\/[\n\S]+/g, "")
       .replace(/[^a-zA-Z0-9\s]/g, "")
+      .replace(/\x0B/g, "")
       .trim();
     const lowercaseText = formattedText.toLowerCase();
-    const stopWords = [
-      "and",
-      "are",
-      "but",
-      "for",
-      "into",
-      "not",
-      "such",
-      "that",
-      "the",
-      "their",
-      "there",
-      "these",
-      "they",
-      "this",
-      "was",
-      "will",
-      "with",
-    ];
     const words = lowercaseText.split(" ");
-    const filteredWords = words.filter((word) => !stopWords.includes(word));
-    const preprocessedText = filteredWords.join(" ");
+    const preprocessedText = words.join(" ");
     return preprocessedText;
   };
 }

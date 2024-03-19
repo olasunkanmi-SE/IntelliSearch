@@ -3,7 +3,13 @@ import { DocumentTypeEnum, DomainEnum } from "../lib/constants";
 import { Result } from "../lib/result";
 
 export interface IEmbeddingService {
-  generateEmbeddings(taskType: TaskType, role?: string): Promise<number[]>;
+  generateEmbeddings(
+    taskType: TaskType,
+    role?: string
+  ): Promise<{
+    embedding: number[];
+    text: string;
+  }>;
   cosineSimilarity(vecA: number[], vecB: number[]): number;
   euclideanDistance(vecA: number[], vecB: number[]): number;
   createDocumentsEmbeddings(

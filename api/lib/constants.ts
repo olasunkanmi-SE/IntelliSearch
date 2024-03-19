@@ -3,12 +3,12 @@ export const AiModels = {
   gemini: "gemini-pro",
 };
 
-export const modelConfig = {
-  maxOutputTokens: 200,
-  temperature: 0.9,
-  topP: 0.1,
-  topK: 16,
-};
+// export const modelConfig = {
+//   maxOutputTokens: 200,
+//   temperature: 0.9,
+//   topP: 0.1,
+//   topK: 16,
+// };
 
 export const HTTP_RESPONSE_CODE = {
   NOT_FOUND: 404,

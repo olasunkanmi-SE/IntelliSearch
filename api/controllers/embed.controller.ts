@@ -17,13 +17,13 @@ export class EmbeddingController {
   async createDocumentEmbeddings(
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    next: express.NextFunction,
   ) {
     const embeddingHandler: CreateDocumentEmbeddingHandler =
       new CreateDocumentEmbeddingHandler();
     try {
       const { title, documentType, domain } = documentRequestSchema.parse(
-        req.body
+        req.body,
       );
       const result = await embeddingHandler.handle({
         title,

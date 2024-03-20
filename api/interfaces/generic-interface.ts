@@ -9,3 +9,8 @@ export interface IDocumentEmbedding {
   text: string;
   embeddings?: number[];
 }
+
+export interface IQueryMatch {
+  context: string;
+  similarity: number;
+}

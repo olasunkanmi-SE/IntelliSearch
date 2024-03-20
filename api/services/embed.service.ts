@@ -8,25 +8,17 @@ import { HttpException } from "../exceptions/exception";
 import { IDocumentService } from "../interfaces/document-service.interface";
 import { IEmbeddingService } from "../interfaces/embedding-service.interface";
 import { ICreateEmbedding, IQueryMatch } from "../interfaces/generic-interface";
-import {
-  AiModels,
-  DocumentTypeEnum,
-  DomainEnum,
-  HTTP_RESPONSE_CODE,
-} from "../lib/constants";
+import { AiModels, DocumentTypeEnum, DomainEnum, HTTP_RESPONSE_CODE } from "../lib/constants";
 import { Result } from "../lib/result";
 import { DocumentRepository } from "../repositories/document.repository";
-import {
-  IDocumentModel,
-  IDocumentTypeModel,
-  IDomainModel,
-} from "../repositories/model";
+import { IDocumentModel, IDocumentTypeModel, IDomainModel } from "../repositories/model";
 import { getValue } from "../utils";
 import { EmbeddingRepository } from "./../repositories/embedding.repository";
 import { GenerativeAIService } from "./ai.service";
 import { DocumentTypeService } from "./document-type.service";
 import { DocumentService } from "./document.service";
 import { DomainService } from "./domain.service";
+import { match } from "assert";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
  * the following roles are commonly used:
@@ -67,10 +59,7 @@ A typical use case for the `RETRIEVAL_DOCUMENT` task type is embedding documents
 of information. For example, you could use this task type to embed articles, FAQs, 
 or product manuals to create a searchable knowledge base for customer support or information retrieval systems.*/
 
-export class EmbeddingService
-  extends GenerativeAIService
-  implements IEmbeddingService
-{
+export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
   documentPath: string = getValue("PDF_ABSOLUTE_PATH");
   constructor(apiKey: string) {
     super(apiKey);
@@ -82,17 +71,14 @@ export class EmbeddingService
   async generateEmbeddings(
     text: string,
     taskType: TaskType,
-    role?: string,
+    role?: string
   ): Promise<{
     embedding: number[];
     text: string;
   }> {
     try {
       if (!Object.values(TaskType).includes(taskType)) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "Please provide a valid task type",
-        );
+        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Please provide a valid task type");
       }
       const model = AiModels.embedding;
       const aiModel = this.generativeModel(model);
@@ -167,33 +153,25 @@ export class EmbeddingService
   async createDocumentsEmbeddings(
     title: string,
     documentType: DocumentTypeEnum,
-    domain: DomainEnum,
+    domain: DomainEnum
   ): Promise<Result<boolean>> {
     try {
-      this.reRankQueryMatches();
       const documentRepository: DocumentRepository = new DocumentRepository();
       const domainService: DomainService = new DomainService();
-      const documentTypeService: DocumentTypeService =
-        new DocumentTypeService();
-      const docType: IDocumentTypeModel | undefined =
-        await documentTypeService.getDocumentType(documentType);
+      const documentTypeService: DocumentTypeService = new DocumentTypeService();
+      const docType: IDocumentTypeModel | undefined = await documentTypeService.getDocumentType(documentType);
       const documentTypeId: number = docType.id;
 
-      const docDomain: IDomainModel | undefined =
-        await domainService.getDomain(domain);
+      const docDomain: IDomainModel | undefined = await domainService.getDomain(domain);
       const domainId: number = docDomain.id;
       const document: IDocumentModel = await documentRepository.create(title);
       let documentId: number;
 
       if (document) {
         documentId = document.id;
-        const documentEmbeddings: { text: string; embeddings?: number[] }[] =
-          await this.createContentEmbeddings();
+        const documentEmbeddings: { text: string; embeddings?: number[] }[] = await this.createContentEmbeddings();
         if (!documentEmbeddings?.length) {
-          throw new HttpException(
-            HTTP_RESPONSE_CODE.BAD_REQUEST,
-            "Unable to create embedding",
-          );
+          throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to create embedding");
         }
         const data: ICreateEmbedding = {
           documentEmbeddings,
@@ -201,10 +179,8 @@ export class EmbeddingService
           documentTypeId,
           domainId,
         };
-        const embeddingRepository: EmbeddingRepository =
-          new EmbeddingRepository();
-        const response =
-          await embeddingRepository.createDocumentEmbeddings(data);
+        const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
+        const response = await embeddingRepository.createDocumentEmbeddings(data);
         const result = response.getValue();
         return Result.ok(result);
       }
@@ -213,27 +189,17 @@ export class EmbeddingService
     }
   }
 
-  async createContentEmbeddings(): Promise<
-    { text: string; embeddings?: number[] }[]
-  > {
+  async createContentEmbeddings(): Promise<{ text: string; embeddings?: number[] }[]> {
     const documentService: IDocumentService = new DocumentService();
     let text: string;
     if (!this.documentPath.length) {
-      throw new HttpException(
-        HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Could not read PDF file",
-      );
+      throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Could not read PDF file");
     }
     text = await documentService.convertPDFToText(this.documentPath);
     const chunks: string[] = documentService.breakTextIntoChunks(text, 2000);
 
     const contentEmbed = chunks.map(
-      async (chunk) =>
-        await this.generateEmbeddings(
-          chunk,
-          TaskType.RETRIEVAL_DOCUMENT,
-          "context",
-        ),
+      async (chunk) => await this.generateEmbeddings(chunk, TaskType.RETRIEVAL_DOCUMENT, "context")
     );
 
     const textEmbeddings: {
@@ -257,10 +223,7 @@ export class EmbeddingService
   async generateUserQueryEmbeddings(query: string): Promise<number[][]> {
     const queries = await this.generateSimilarQueries(query);
     if (!queries?.length) {
-      throw new HttpException(
-        HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Unable to generate similar queries",
-      );
+      throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to generate similar queries");
     }
     const queriesArray = queries.split("\n");
     console.log(queriesArray);
@@ -271,67 +234,43 @@ export class EmbeddingService
     return embeddings.map((e) => e.embedding);
   }
 
-  async getQueryMatches(
-    query: string,
-    matchCount: number,
-    similarityThreshold: number,
-  ): Promise<IQueryMatch[]> {
+  async getQueryMatches(query: string, matchCount: number, similarityThreshold: number): Promise<IQueryMatch[]> {
     const queryEmbeddings = await this.generateUserQueryEmbeddings(query);
     if (!queryEmbeddings?.length) {
-      throw new HttpException(
-        HTTP_RESPONSE_CODE.BAD_REQUEST,
-        "Unable to generate user query embeddings",
-      );
+      throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to generate user query embeddings");
     }
     const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
-    const [firstEmbeddings, secondEmbeddings, thirdEmbeddings] =
-      queryEmbeddings;
+    const [firstEmbeddings, secondEmbeddings, thirdEmbeddings] = queryEmbeddings;
     //Check if this works with map and promise.all
-    const originalQuery: IQueryMatch[] =
-      await embeddingRepository.matchDocuments(
-        firstEmbeddings,
-        matchCount,
-        similarityThreshold,
-      );
-    const intialAiGenratedQuery: IQueryMatch[] =
-      await embeddingRepository.matchDocuments(
-        secondEmbeddings,
-        matchCount,
-        similarityThreshold,
-      );
-    const otherAiGenratedQuery: IQueryMatch[] =
-      await embeddingRepository.matchDocuments(
-        thirdEmbeddings,
-        matchCount,
-        similarityThreshold,
-      );
-    const matches: IQueryMatch[] = [
-      ...originalQuery,
-      ...intialAiGenratedQuery,
-      ...otherAiGenratedQuery,
-    ];
+    const originalQuery: IQueryMatch[] = await embeddingRepository.matchDocuments(
+      firstEmbeddings,
+      matchCount,
+      similarityThreshold
+    );
+    const intialAiGenratedQuery: IQueryMatch[] = await embeddingRepository.matchDocuments(
+      secondEmbeddings,
+      matchCount,
+      similarityThreshold
+    );
+    const otherAiGenratedQuery: IQueryMatch[] = await embeddingRepository.matchDocuments(
+      thirdEmbeddings,
+      matchCount,
+      similarityThreshold
+    );
+    const matches: IQueryMatch[] = [...originalQuery, ...intialAiGenratedQuery, ...otherAiGenratedQuery];
     return matches;
   }
 
-  async reRankQueryMatches() {
-    const matches = await this.getQueryMatches(
-      "Which Surah talk about fasting",
-      4,
-      0.6,
-    );
-    if (!matches?.length) {
-      return "No matches for user query";
-    }
-    const similarityMatches = matches.map(({ context, textEmbedding }) => {
-      const cosineSimilarity = this.cosineSimilarity(
-        textEmbedding,
-        matches[0].textEmbedding,
-      );
-      return { similarity: cosineSimilarity, context };
-    });
-    const sorted = similarityMatches.toSorted(
-      (a, b) => b.similarity - a.similarity,
-    );
-    return sorted.slice(0, 5);
-  }
+  // async reRankQueryMatches() {
+  //   const matches = await this.getQueryMatches("Which Surah talk about fasting", 4, 0.6);
+  //   if (!matches?.length) {
+  //     return "No matches for user query";
+  //   }
+  //   const similarityMatches = matches.map(({ context, textEmbedding }) => {
+  //     const cosineSimilarity = this.cosineSimilarity(textEmbedding, matches[0].textEmbedding);
+  //     return { similarity: cosineSimilarity, context };
+  //   });
+  //   const sorted = similarityMatches.toSorted((a, b) => b.similarity - a.similarity);
+  //   return sorted.slice(0, 5);
+  // }
 }

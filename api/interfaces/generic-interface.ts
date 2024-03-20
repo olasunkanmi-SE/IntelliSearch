@@ -13,5 +13,4 @@ export interface IDocumentEmbedding {
 export interface IQueryMatch {
   context: string;
   similarity: number;
-  textEmbedding: number[];
 }

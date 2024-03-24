@@ -14,11 +14,7 @@ export class DomainController {
     this.router.post(`${this.path}/create`, this.createDomain);
   }
 
-  async createDomain(
-    req: express.Request,
-    res: any,
-    next: express.NextFunction,
-  ): Promise<void> {
+  async createDomain(req: express.Request, res: any, next: express.NextFunction): Promise<void> {
     try {
       const { name } = domainRequestSchema.parse(req.body);
       const domainHandler = new DomainHandler();
@@ -31,6 +27,7 @@ export class DomainController {
       }
     } catch (error) {
       generateErrorResponse(error, res, next);
+      next(error);
     }
   }
 }

@@ -1,7 +1,13 @@
-import { ChatSession, CountTokensRequest, EnhancedGenerateContentResponse, Part } from "@google/generative-ai";
+import {
+  ChatSession,
+  CountTokensRequest,
+  EnhancedGenerateContentResponse,
+  GenerateContentResult,
+  Part,
+} from "@google/generative-ai";
 import { oneLine, stripIndents } from "common-tags";
-import { GenerativeAIService } from "./ai.service";
 import { AiModels } from "../lib/constants";
+import { GenerativeAIService } from "./ai.service";
 
 export class ChatService extends GenerativeAIService {
   initialConvo: any;
@@ -47,38 +53,15 @@ export class ChatService extends GenerativeAIService {
     return await model.startChat(this.initialConvo);
   };
   async run() {
-    const msg1 = `${this.conversation.questions[0]}`;
-    this.displayChatTokenCount(msg1);
-    const chat = await this.initChat();
-    const result1 = await chat.sendMessageStream(msg1);
-    this.streamToStdout(result1.stream);
-
-    const msg2 = `${this.conversation.questions[1]}`;
-    this.displayChatTokenCount(msg2);
-    const result2 = await chat.sendMessageStream(msg2);
-    this.streamToStdout(result2.stream);
-
-    const msg3 = `${this.conversation.questions[2]}`;
-    this.displayChatTokenCount(msg3);
-    const result3 = await chat.sendMessageStream(msg3);
-    this.streamToStdout(result3.stream);
-
-    // const msg4 = "What technical area is Olasunkanmi exploring on January 9th";
-    // this.displayChatTokenCount(msg4);
-    // const result4 = await chat.sendMessageStream(msg4);
-    // this.streamToStdout(result4.stream);
-
-    // const msg5 = "Any chance I could go for tennis?";
-    // this.displayChatTokenCount(msg5);
-    // const result5 = await chat.sendMessageStream(msg5);
-    // this.streamToStdout(result5.stream);
-
-    // Display history
-    console.log(JSON.stringify(await chat.getHistory(), null, 2));
-
-    // Display the last aggregated response
-    // const response = await result3.response;
-    // console.log(JSON.stringify(response, null, 2));
+    const msg = `${this.conversation.questions[0]}`;
+    this.displayChatTokenCount(msg);
+    const chat: ChatSession = await this.initChat();
+    const result: GenerateContentResult = await chat.sendMessage(msg);
+    const response: EnhancedGenerateContentResponse = await result.response;
+    const text: string = response.text();
+    console.log(text);
+    // console.log(JSON.stringify(await chat.getHistory(), null, 2));
+    return text;
   }
 
   displayTokenCount = async (request: string | (string | Part)[] | CountTokensRequest) => {

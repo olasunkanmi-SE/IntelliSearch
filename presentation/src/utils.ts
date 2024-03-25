@@ -13,3 +13,10 @@ export const formatText = (text: string) => {
   }
   return formattedText.replace(/\*/g, "");
 };
+
+export const formatCodeBlocks = (text: string) => {
+  const regex = /```([^`]+)```/g;
+  return text.replace(regex, (_, context) => {
+    return `<pre><code>${context}</code></pre>`;
+  });
+};

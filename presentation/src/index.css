@@ -1,0 +1,11 @@
+.loading-skeleton {
+    background-color: #f0f0f0; /* Background color of skeleton */
+    border-radius: 4px; /* Border radius to round corners */
+    animation: loading 1s infinite ease-in-out; /* Animation for loading effect */
+  }
+  
+  @keyframes loading {
+    0% { opacity: 0.5; } /* Start of animation, semi-transparent */
+    50% { opacity: 1; } /* Middle of animation, fully opaque */
+    100% { opacity: 0.5; } /* End of animation, semi-transparent */
+  }

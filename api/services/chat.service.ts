@@ -65,7 +65,7 @@ export class ChatService extends GenerativeAIService {
     return model.startChat(this.initialConvo);
   };
 
-  async run(): Promise<IChatResponseDTO> {
+  async run(): Promise<Partial<IChatResponseDTO>> {
     const question = `${this.conversation.questions[0]}`;
     this.displayChatTokenCount(question);
     const chat: ChatSession = await this.initChat();
@@ -73,14 +73,10 @@ export class ChatService extends GenerativeAIService {
     let text = "";
     for await (const chunk of result.stream) {
       const chunkText = chunk.text();
-      console.log(chunkText);
       text += chunkText;
     }
-    const chatHistory = JSON.stringify(await chat.getHistory(), null, 2);
     return {
-      question,
       answer: text,
-      chatHistory,
     };
   }
 

@@ -32,6 +32,12 @@ export interface IChatRequestDTO {
     documentId: number;
     pageNumber: number;
   };
+  chatHistory?: IHistory[];
+}
+
+export interface IHistory {
+  role?: string;
+  parts?: { text?: string }[];
 }
 
 export interface IChatResponseDTO {

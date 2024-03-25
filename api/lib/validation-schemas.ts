@@ -20,11 +20,16 @@ export const chatRequestSchema = z.object({
       pageNumber: z.number(),
     })
   ),
-  chatHistory: z
-    .object({
-      role: z.string(),
-      parts: z.object({ text: z.string() }).array(),
-    })
-    .optional()
-    .array(),
+  chatHistory: z.string(),
 });
+
+export const chatHistorySchema = z.array(
+  z.object({
+    role: z.string(),
+    parts: z.array(
+      z.object({
+        text: z.string(),
+      })
+    ),
+  })
+);

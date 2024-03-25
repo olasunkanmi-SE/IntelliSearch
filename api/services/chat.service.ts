@@ -8,13 +8,17 @@ import {
 import { oneLine, stripIndents } from "common-tags";
 import { AiModels } from "../lib/constants";
 import { GenerativeAIService } from "./ai.service";
-import { IChatResponseDTO } from "../repositories/dtos/dtos";
+import { IChatResponseDTO, IHistory } from "../repositories/dtos/dtos";
 
 export class ChatService extends GenerativeAIService {
   initialConvo: any;
   constructor(
     apiKey: string,
-    private readonly conversation: { context: string; questions: string[] }
+    private readonly conversation: {
+      context: string;
+      questions: string[];
+      chatHistory: IHistory[];
+    }
   ) {
     super(apiKey);
     this.initChat();
@@ -29,36 +33,42 @@ export class ChatService extends GenerativeAIService {
           parts: [
             {
               text: stripIndents`${oneLine` 
-      Using the information contained in the context,
-      give a comprehensive answer to the question.
-      Respond only to the question asked, response should be concise and relevant to the question.
-      You should imply how the mybid project intend to solve issues relating to the question if you can find 
-      any within the given context.
-      If the answer cannot be deduced from the context, do not give an answer.
-      context: ${conversation.context}     
+              Give a coincise answer
+              Examine the given context for any problems or challenges mentioned.
+              Consider how the MyBid project could potentially address or solve these issues based on the context provided.
+              If it's possible to deduce how MyBid intends to solve the issues, provide that information. If not, respond with "I don't know".
+              Avoid External Sources: Do not search for information outside of the given context to formulate your response.
+              If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
+              Here is the context: ${conversation.context}     
       `}`,
             },
           ],
         },
         {
           role: "model",
-          parts: [{ text: "Great to meet you. What would you like to know about Mybid?" }],
+          parts: [
+            {
+              text: conversation.questions[0],
+            },
+          ],
         },
+        ...this.conversation.chatHistory,
       ],
       // generationConfig: {
       //   maxOutputTokens: 200,
       // },
     };
     const aiModel = AiModels.gemini;
-    const model = await this.generativeModel(aiModel);
-    return await model.startChat(this.initialConvo);
+    const model = this.generativeModel(aiModel);
+    return model.startChat(this.initialConvo);
   };
+
   async run(): Promise<IChatResponseDTO> {
     const question = `${this.conversation.questions[0]}`;
     this.displayChatTokenCount(question);
     const chat: ChatSession = await this.initChat();
     const result: GenerateContentResult = await chat.sendMessage(question);
-    const response: EnhancedGenerateContentResponse = await result.response;
+    const response: EnhancedGenerateContentResponse = result.response;
     const answer = response.text();
     const chatHistory = JSON.stringify(await chat.getHistory(), null, 2);
     return {
@@ -68,7 +78,9 @@ export class ChatService extends GenerativeAIService {
     };
   }
 
-  displayTokenCount = async (request: string | (string | Part)[] | CountTokensRequest) => {
+  displayTokenCount = async (
+    request: string | (string | Part)[] | CountTokensRequest
+  ) => {
     const aiModel = AiModels.gemini;
     const model = this.generativeModel(aiModel);
     const { totalTokens } = await model.countTokens(request);
@@ -82,7 +94,9 @@ export class ChatService extends GenerativeAIService {
     await this.displayTokenCount({ contents: [...history, msgContent] });
   };
 
-  streamToStdout = async (stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>) => {
+  streamToStdout = async (
+    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>
+  ) => {
     console.log("Streaming...\n");
     for await (const chunk of stream) {
       const chunkText = chunk.text();

@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  Stack,
+} from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import DOMPurify from "dompurify";
+import { formatText } from "../utils";
 
 // interface Message {
 //   text: string;
@@ -34,24 +43,22 @@ export function Thread() {
       return;
     }
     try {
-      const body = {
+      const response = await axiosPrivate.post("/chat", {
         question,
-        history: chatHistory,
-      };
-
-      const response = await axiosPrivate.post("/domain/create", JSON.stringify(body));
+        chatHistory: JSON.stringify(chatHistory),
+      });
       const data = response.data;
-      console.log(data);
+      console.log(JSON.stringify(data.data.chatHistory));
       setChatHistory((oldChat) => [
-        ...oldChat,
         {
           role: "user",
           parts: [{ text: question }],
         },
         {
           role: "model",
-          parts: [{ text: data }],
+          parts: [{ text: data.data.answer }],
         },
+        ...oldChat,
       ]);
       setQuestion("");
       return data;
@@ -104,13 +111,16 @@ export function Thread() {
             <p>{error}</p>
           </div>
           {chatHistory.map((chatItem, index) => (
-            <Card style={{ marginBottom: "10px", marginTop: "10px" }} key={index}>
+            <Card
+              style={{ marginBottom: "10px", marginTop: "10px" }}
+              key={index}
+            >
               <Card.Header>{chatItem.role}</Card.Header>
               {chatItem.parts.map((part, i) => (
                 <Card.Body key={i}>
                   <Card.Text
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(part.text),
+                      __html: DOMPurify.sanitize(formatText(part.text)),
                     }}
                   ></Card.Text>
                 </Card.Body>

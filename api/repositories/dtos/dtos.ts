@@ -25,3 +25,17 @@ export interface ICreateDomainRequestDTO {
 export interface ICreateDocumentTypeRequestDTO {
   name: DocumentTypeEnum;
 }
+
+export interface IChatRequestDTO {
+  question: string;
+  metaData?: {
+    documentId: number;
+    pageNumber: number;
+  };
+}
+
+export interface IChatResponseDTO {
+  question: string;
+  answer: string;
+  chatHistory: string;
+}

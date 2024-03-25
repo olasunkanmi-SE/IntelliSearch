@@ -8,6 +8,7 @@ import {
 import { oneLine, stripIndents } from "common-tags";
 import { AiModels } from "../lib/constants";
 import { GenerativeAIService } from "./ai.service";
+import { IChatResponseDTO } from "../repositories/dtos/dtos";
 
 export class ChatService extends GenerativeAIService {
   initialConvo: any;
@@ -44,24 +45,27 @@ export class ChatService extends GenerativeAIService {
           parts: [{ text: "Great to meet you. What would you like to know about Mybid?" }],
         },
       ],
-      generationConfig: {
-        maxOutputTokens: 200,
-      },
+      // generationConfig: {
+      //   maxOutputTokens: 200,
+      // },
     };
     const aiModel = AiModels.gemini;
     const model = await this.generativeModel(aiModel);
     return await model.startChat(this.initialConvo);
   };
-  async run() {
-    const msg = `${this.conversation.questions[0]}`;
-    this.displayChatTokenCount(msg);
+  async run(): Promise<IChatResponseDTO> {
+    const question = `${this.conversation.questions[0]}`;
+    this.displayChatTokenCount(question);
     const chat: ChatSession = await this.initChat();
-    const result: GenerateContentResult = await chat.sendMessage(msg);
+    const result: GenerateContentResult = await chat.sendMessage(question);
     const response: EnhancedGenerateContentResponse = await result.response;
-    const text: string = response.text();
-    console.log(text);
-    // console.log(JSON.stringify(await chat.getHistory(), null, 2));
-    return text;
+    const answer = response.text();
+    const chatHistory = JSON.stringify(await chat.getHistory(), null, 2);
+    return {
+      question,
+      answer,
+      chatHistory,
+    };
   }
 
   displayTokenCount = async (request: string | (string | Part)[] | CountTokensRequest) => {

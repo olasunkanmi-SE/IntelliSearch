@@ -48,12 +48,11 @@ export function generatorValidationError(issue: any) {
 export function generateErrorResponse(error: any, res: express.Response, next: express.NextFunction) {
   try {
     let response;
-    response = res.status(400).json(Result.fail(error.message, 400));
+    response = "";
     if (error instanceof ZodError) {
       const errorMessage = error.issues.map((issue) => generatorValidationError(issue)).join(" ");
       response = res.status(400).json(Result.fail(errorMessage, 400));
     }
-    console.error("An unexpected error occurred:", error);
     return response;
   } catch (error) {
     console.error("validation error", error);

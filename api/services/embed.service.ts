@@ -226,7 +226,6 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
       throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to generate similar queries");
     }
     const queriesArray = queries.split("\n");
-    console.log(queriesArray);
     const embeddingPromise = queriesArray.map((query) => {
       return this.generateEmbeddings(query, TaskType.RETRIEVAL_QUERY, "query");
     });
@@ -260,17 +259,4 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     const matches: IQueryMatch[] = [...originalQuery, ...intialAiGenratedQuery, ...otherAiGenratedQuery];
     return matches;
   }
-
-  // async reRankQueryMatches() {
-  //   const matches = await this.getQueryMatches("Which Surah talk about fasting", 4, 0.6);
-  //   if (!matches?.length) {
-  //     return "No matches for user query";
-  //   }
-  //   const similarityMatches = matches.map(({ context, textEmbedding }) => {
-  //     const cosineSimilarity = this.cosineSimilarity(textEmbedding, matches[0].textEmbedding);
-  //     return { similarity: cosineSimilarity, context };
-  //   });
-  //   const sorted = similarityMatches.toSorted((a, b) => b.similarity - a.similarity);
-  //   return sorted.slice(0, 5);
-  // }
 }

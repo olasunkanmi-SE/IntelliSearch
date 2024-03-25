@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import DOMPurify from "dompurify";
 
 // interface Message {
 //   text: string;
@@ -71,31 +72,6 @@ export function Thread() {
     setError("");
     setChatHistory([]);
   };
-  const exampleChatHistory: IHistory[] = [
-    {
-      role: "user",
-      parts: [{ text: "Hi there!" }, { text: "How can I help you?" }],
-    },
-    {
-      role: "agent",
-      parts: [
-        { text: "Hello! How can I assist you today?" },
-        { text: "Please provide more details about your issue." },
-      ],
-    },
-    {
-      role: "user",
-      parts: [{ text: "Hi there!" }, { text: "How can I help you?" }],
-    },
-    {
-      role: "agent",
-      parts: [
-        { text: "Hello! How can I assist you today?" },
-        { text: "Please provide more details about your issue." },
-      ],
-    },
-    // Add more example chat histories as needed
-  ];
 
   return (
     <Container>
@@ -127,12 +103,16 @@ export function Thread() {
           <div>
             <p>{error}</p>
           </div>
-          {exampleChatHistory.map((chatItem, index) => (
+          {chatHistory.map((chatItem, index) => (
             <Card style={{ marginBottom: "10px", marginTop: "10px" }} key={index}>
               <Card.Header>{chatItem.role}</Card.Header>
               {chatItem.parts.map((part, i) => (
                 <Card.Body key={i}>
-                  <Card.Text>{part.text}</Card.Text>
+                  <Card.Text
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(part.text),
+                    }}
+                  ></Card.Text>
                 </Card.Body>
               ))}
             </Card>

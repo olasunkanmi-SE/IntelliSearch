@@ -39,7 +39,9 @@ export class ChatService extends GenerativeAIService {
               If it's possible to deduce how MyBid intends to solve the issues, provide that information. If not, respond with "I don't know".
               Avoid External Sources: Do not search for information outside of the given context to formulate your response.
               If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
-              Here is the context: ${conversation.context}     
+              Here is the context: ${conversation.context}
+              Reminder: Please answer the following questions based solely on the context provided. Do not search for information outside of the given context. 
+              Reminder: If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
       `}`,
             },
           ],
@@ -67,13 +69,17 @@ export class ChatService extends GenerativeAIService {
     const question = `${this.conversation.questions[0]}`;
     this.displayChatTokenCount(question);
     const chat: ChatSession = await this.initChat();
-    const result: GenerateContentResult = await chat.sendMessage(question);
-    const response: EnhancedGenerateContentResponse = result.response;
-    const answer = response.text();
+    const result = await chat.sendMessageStream(question);
+    let text = "";
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      console.log(chunkText);
+      text += chunkText;
+    }
     const chatHistory = JSON.stringify(await chat.getHistory(), null, 2);
     return {
       question,
-      answer,
+      answer: text,
       chatHistory,
     };
   }

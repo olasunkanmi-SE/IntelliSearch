@@ -11,3 +11,25 @@ export const domainRequestSchema = z.object({ name });
 
 const docType = z.nativeEnum(DocumentTypeEnum);
 export const docTypeRequestSchema = z.object({ name: docType });
+
+export const chatRequestSchema = z.object({
+  question: z.string(),
+  metaData: z.optional(
+    z.object({
+      documentId: z.number(),
+      pageNumber: z.number(),
+    })
+  ),
+  chatHistory: z.string(),
+});
+
+export const chatHistorySchema = z.array(
+  z.object({
+    role: z.string(),
+    parts: z.array(
+      z.object({
+        text: z.string(),
+      })
+    ),
+  })
+);

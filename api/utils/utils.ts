@@ -9,9 +9,7 @@ import * as express from "express";
 import { Result } from "../lib/result";
 import { ZodError } from "zod";
 
-export async function streamToStdout(
-  stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>,
-) {
+export async function streamToStdout(stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>) {
   console.log("Streaming...\n");
   for await (const chunk of stream) {
     const chunkText = chunk.text();
@@ -22,17 +20,13 @@ export async function streamToStdout(
 
 export async function displayTokenCount(
   model: GenerativeModel,
-  request: string | (string | Part)[] | CountTokensRequest,
+  request: string | (string | Part)[] | CountTokensRequest
 ) {
   const { totalTokens } = await model.countTokens(request);
   console.log("Token count: ", totalTokens);
 }
 
-export async function displayChatTokenCount(
-  model: GenerativeModel,
-  chat: ChatSession,
-  msg: string,
-) {
+export async function displayChatTokenCount(model: GenerativeModel, chat: ChatSession, msg: string) {
   const history = await chat.getHistory();
   const msgContent = { role: "user", parts: [{ text: msg }] };
   await displayTokenCount(model, { contents: [...history, msgContent] });
@@ -51,20 +45,17 @@ export function generatorValidationError(issue: any) {
   }
 }
 
-export function generateErrorResponse(
-  error: any,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  let response;
-  response = res.status(400).json(Result.fail(error.message, 400));
-  if (error instanceof ZodError) {
-    const errorMessage = error.issues
-      .map((issue) => generatorValidationError(issue))
-      .join(" ");
-    response = res.status(400).json(Result.fail(errorMessage, 400));
+export function generateErrorResponse(error: any, res: express.Response, next: express.NextFunction) {
+  try {
+    let response;
+    response = "";
+    if (error instanceof ZodError) {
+      const errorMessage = error.issues.map((issue) => generatorValidationError(issue)).join(" ");
+      response = res.status(400).json(Result.fail(errorMessage, 400));
+    }
+    return response;
+  } catch (error) {
+    console.error("validation error", error);
+    next(error);
   }
-  console.error("An unexpected error occurred:", error);
-  next(error);
-  return response;
 }

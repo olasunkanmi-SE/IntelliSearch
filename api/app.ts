@@ -1,24 +1,22 @@
 import express from "express";
 import * as bodyParser from "body-parser";
 import { errorMiddleware } from "./middlewares/error";
+import cors from "cors";
 export class App {
   app: express.Application;
 
   constructor(
     private readonly controllers: unknown,
-    private readonly port: number,
+    private readonly port: number
   ) {
     this.app = express();
     this.initMiddlewares();
     this.initControllers(this.controllers);
-    this.intializeErrorHandling();
   }
 
   private initMiddlewares() {
     this.app.use(bodyParser.json());
-  }
-
-  private intializeErrorHandling() {
+    this.app.use(cors());
     this.app.use(errorMiddleware);
   }
 

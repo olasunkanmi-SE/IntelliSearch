@@ -7,13 +7,14 @@ import { getValue } from "../utils";
 import { CHAT_PARAMS } from "./../../presentation/src/constants";
 
 export class ChatHandler
-  implements IRequestHandler<IChatRequestDTO, Result<IChatResponseDTO>>
+  implements
+    IRequestHandler<IChatRequestDTO, Result<Partial<IChatResponseDTO>>>
 {
   private readonly apiKey: string = getValue("API_KEY");
   async handle({
     question,
     chatHistory,
-  }: IChatRequestDTO): Promise<Result<IChatResponseDTO>> {
+  }: IChatRequestDTO): Promise<Result<Partial<IChatResponseDTO>>> {
     try {
       const embeddingService: EmbeddingService = new EmbeddingService(
         this.apiKey

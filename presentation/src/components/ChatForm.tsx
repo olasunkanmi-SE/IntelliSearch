@@ -1,30 +1,9 @@
-import { useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-  Stack,
-} from "react-bootstrap";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import DOMPurify from "dompurify";
-import { formatText } from "../utils";
-
-// interface Message {
-//   text: string;
-//   metaData?: {
-//     documentId: number;
-//     pageNumber: number;
-//   };
-// }
-
-// interface Iresponse {
-//   history: { role: string; parts: { text: string }[] }[];
-//   question: string;
-//   answer: string;
-// }
+import { useState } from "react";
+import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { formatCodeBlocks, formatText } from "../utils";
+import NavBar from "./NavBar";
 
 interface IHistory {
   role: string;
@@ -36,6 +15,7 @@ export function Thread() {
   const [error, setError] = useState("");
   const [question, setQuestion] = useState("");
   const [chatHistory, setChatHistory] = useState<IHistory[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const formAction = async () => {
     if (!question) {
@@ -43,12 +23,13 @@ export function Thread() {
       return;
     }
     try {
+      setLoading(true);
+      setQuestion("");
       const response = await axiosPrivate.post("/chat", {
         question,
         chatHistory: JSON.stringify(chatHistory),
       });
       const data = response.data;
-      console.log(JSON.stringify(data.data.chatHistory));
       setChatHistory((oldChat) => [
         {
           role: "user",
@@ -60,12 +41,13 @@ export function Thread() {
         },
         ...oldChat,
       ]);
-      setQuestion("");
+      setLoading(false);
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error(error);
       setError(error.message);
+      setLoading(false);
     }
   };
 
@@ -83,8 +65,11 @@ export function Thread() {
   return (
     <Container>
       <Row>
+        <NavBar />
+      </Row>
+      <Row>
         <Col></Col>
-        <Col xs={8}>
+        <Col xs={6}>
           <div style={{ marginTop: "20px" }}>
             <Form onSubmit={handleSubmit}>
               <Stack direction="horizontal" gap={3}>
@@ -96,37 +81,60 @@ export function Thread() {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                 />
-                <Button variant="outline-success" onClick={formAction}>
+                <Button variant="dark" onClick={formAction} disabled={loading}>
                   Send
                 </Button>
                 <div className="vr" />
-                <Button variant="outline-danger" onClick={clearChat}>
+                <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
                   Reset
                 </Button>
               </Stack>
             </Form>
           </div>
 
-          <div>
+          <div style={{ color: "red" }}>
             <p>{error}</p>
           </div>
-          {chatHistory.map((chatItem, index) => (
-            <Card
-              style={{ marginBottom: "10px", marginTop: "10px" }}
-              key={index}
-            >
-              <Card.Header>{chatItem.role}</Card.Header>
-              {chatItem.parts.map((part, i) => (
-                <Card.Body key={i}>
-                  <Card.Text
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(formatText(part.text)),
-                    }}
-                  ></Card.Text>
-                </Card.Body>
-              ))}
-            </Card>
-          ))}
+          <div>
+            {loading ? (
+              <>
+                <div
+                  className="loader"
+                  style={{
+                    marginBottom: "10px",
+                    marginTop: "10px",
+                    height: "70px",
+                  }}
+                ></div>
+                <div
+                  className="loader"
+                  style={{
+                    marginBottom: "10px",
+                    marginTop: "10px",
+                    height: "140px",
+                  }}
+                ></div>
+              </>
+            ) : (
+              ""
+            )}
+          </div>
+          <div>
+            {chatHistory.map((chatItem, index) => (
+              <Card style={{ marginBottom: "10px", marginTop: "10px" }} key={index}>
+                <Card.Header>{chatItem.role && chatItem.role === "user" ? "Question" : "Answer"}</Card.Header>
+                {chatItem.parts.map((part, i) => (
+                  <Card.Body key={i}>
+                    <Card.Text
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(formatCodeBlocks(formatText(part.text))),
+                      }}
+                    ></Card.Text>
+                  </Card.Body>
+                ))}
+              </Card>
+            ))}
+          </div>
         </Col>
         <Col></Col>
       </Row>

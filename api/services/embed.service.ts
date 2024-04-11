@@ -18,7 +18,7 @@ import { GenerativeAIService } from "./ai.service";
 import { DocumentTypeService } from "./document-type.service";
 import { DocumentService } from "./document.service";
 import { DomainService } from "./domain.service";
-import { match } from "assert";
+import { oneLine } from "common-tags";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
  * the following roles are commonly used:
@@ -97,12 +97,14 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     }
   }
 
-  /**
-   * Calculates the cosine similarity between two vectors.
-   * @param vecA - The first vector.
-   * @param vecB - The second vector.
-   * @returns The cosine similarity between the two vectors.
-   */
+  /*  Computes the cosine similarity between two vectors of equal length.
+   *   Cosine similarity is a measure of the similarity between two vectors, and is calculated by finding the dot product
+   *  of the two vectors divided by the product of their magnitudes.
+   *  @param vecA - The first vector * @param vecB - The second vector
+   *  @throws {Error} if the vectors are not of equal length
+   *  @returns {number} - A number between -1 and 1 representing the cosine similarity of the two vectors
+   *
+   * */
   cosineSimilarity(vecA: number[], vecB: number[]): number {
     let consineDistance = 0;
     let dotProduct = 0;
@@ -210,16 +212,35 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     return textEmbeddings;
   }
 
+  /**
+   * Generates 2 similar queries and appends the original query to the generated queries.
+   * @param query - The original query
+   * @returns A promise that resolves to a string of the generated queries
+   *  */
   async generateSimilarQueries(query: string): Promise<string> {
     const model = AiModels.gemini;
     const aiModel: GenerativeModel = this.generativeModel(model);
-    const prompt = `Generate 2 additional comma seperated queries that are similar to this query and append the original query too: ${query}`;
+    const prompt = oneLine`
+    when asked a compound question that contains multiple parts, 
+    I want you to break it down into separate sub-queries that can be answered individually, 
+    the query should be broken down to at most 3 parts, return comma seperated queries.
+    However if the question is a single question, straight forward query without multiple parts, 
+    Generate 2 additional comma seperated queries that are similar to this query and append the original query too: ${query}
+    `;
     const result: GenerateContentResult = await aiModel.generateContent(prompt);
     const response: EnhancedGenerateContentResponse = result.response;
     const text: string = response.text();
+    console.log(text);
     return text;
   }
 
+  /**
+   * Generates query embeddings for retrieval task
+   * Generates similar queries and then generates embeddings for each query
+   * @param query - The query to generate embeddings for
+   * @returns A Promise that resolves to a 2D array of embeddings
+   * @throws {HttpException} if unable to generate similar queries
+   **/
   async generateUserQueryEmbeddings(query: string): Promise<number[][]> {
     const queries = await this.generateSimilarQueries(query);
     if (!queries?.length) {
@@ -233,30 +254,27 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     return embeddings.map((e) => e.embedding);
   }
 
+  /**
+   * Generates query matches for the given user query, match count, and similarity threshold.
+   * 1. Generate embeddings for the user query.
+   * 2. Match documents to the query embeddings.
+   * 3. Flattens the resulting matches.
+   * @param query - The user query to match against.
+   * @param matchCount - The number of matches to return per embedding.
+   * @param similarityThreshold - The minimum similarity score to consider a match.
+   * @returns An array of query matches.
+   * @throws {HttpException} if query embeddings could not be generated.
+   **/
   async getQueryMatches(query: string, matchCount: number, similarityThreshold: number): Promise<IQueryMatch[]> {
     const queryEmbeddings = await this.generateUserQueryEmbeddings(query);
     if (!queryEmbeddings?.length) {
       throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to generate user query embeddings");
     }
     const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
-    const [firstEmbeddings, secondEmbeddings, thirdEmbeddings] = queryEmbeddings;
-    //Check if this works with map and promise.all
-    const originalQuery: IQueryMatch[] = await embeddingRepository.matchDocuments(
-      firstEmbeddings,
-      matchCount,
-      similarityThreshold
+    const embeddings = queryEmbeddings.map((embedding) =>
+      embeddingRepository.matchDocuments(embedding, matchCount, similarityThreshold)
     );
-    const intialAiGenratedQuery: IQueryMatch[] = await embeddingRepository.matchDocuments(
-      secondEmbeddings,
-      matchCount,
-      similarityThreshold
-    );
-    const otherAiGenratedQuery: IQueryMatch[] = await embeddingRepository.matchDocuments(
-      thirdEmbeddings,
-      matchCount,
-      similarityThreshold
-    );
-    const matches: IQueryMatch[] = [...originalQuery, ...intialAiGenratedQuery, ...otherAiGenratedQuery];
-    return matches;
+    const matches = await Promise.all(embeddings);
+    return matches.flat();
   }
 }

@@ -1,14 +1,6 @@
 import DOMPurify from "dompurify";
 import { useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-  Stack,
-} from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { formatCodeBlocks, formatText } from "../utils";
 import NavBar from "./NavBar";
@@ -93,11 +85,7 @@ export function Thread() {
                   Send
                 </Button>
                 <div className="vr" />
-                <Button
-                  variant="outline-danger"
-                  onClick={clearChat}
-                  disabled={loading}
-                >
+                <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
                   Reset
                 </Button>
               </Stack>
@@ -111,7 +99,7 @@ export function Thread() {
             {loading ? (
               <>
                 <div
-                  className="loading-skeleton"
+                  className="loader"
                   style={{
                     marginBottom: "10px",
                     marginTop: "10px",
@@ -119,7 +107,7 @@ export function Thread() {
                   }}
                 ></div>
                 <div
-                  className="loading-skeleton"
+                  className="loader"
                   style={{
                     marginBottom: "10px",
                     marginTop: "10px",
@@ -133,22 +121,13 @@ export function Thread() {
           </div>
           <div>
             {chatHistory.map((chatItem, index) => (
-              <Card
-                style={{ marginBottom: "10px", marginTop: "10px" }}
-                key={index}
-              >
-                <Card.Header>
-                  {chatItem.role && chatItem.role === "user"
-                    ? "Question"
-                    : "Answer"}
-                </Card.Header>
+              <Card style={{ marginBottom: "10px", marginTop: "10px" }} key={index}>
+                <Card.Header>{chatItem.role && chatItem.role === "user" ? "Question" : "Answer"}</Card.Header>
                 {chatItem.parts.map((part, i) => (
                   <Card.Body key={i}>
                     <Card.Text
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(
-                          formatCodeBlocks(formatText(part.text))
-                        ),
+                        __html: DOMPurify.sanitize(formatCodeBlocks(formatText(part.text))),
                       }}
                     ></Card.Text>
                   </Card.Body>

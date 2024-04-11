@@ -1,10 +1,4 @@
-import {
-  ChatSession,
-  CountTokensRequest,
-  EnhancedGenerateContentResponse,
-  GenerateContentResult,
-  Part,
-} from "@google/generative-ai";
+import { ChatSession, CountTokensRequest, EnhancedGenerateContentResponse, Part } from "@google/generative-ai";
 import { oneLine, stripIndents } from "common-tags";
 import { AiModels } from "../lib/constants";
 import { GenerativeAIService } from "./ai.service";
@@ -80,9 +74,7 @@ export class ChatService extends GenerativeAIService {
     };
   }
 
-  displayTokenCount = async (
-    request: string | (string | Part)[] | CountTokensRequest
-  ) => {
+  displayTokenCount = async (request: string | (string | Part)[] | CountTokensRequest) => {
     const aiModel = AiModels.gemini;
     const model = this.generativeModel(aiModel);
     const { totalTokens } = await model.countTokens(request);
@@ -96,9 +88,7 @@ export class ChatService extends GenerativeAIService {
     await this.displayTokenCount({ contents: [...history, msgContent] });
   };
 
-  streamToStdout = async (
-    stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>
-  ) => {
+  streamToStdout = async (stream: AsyncGenerator<EnhancedGenerateContentResponse, any, unknown>) => {
     console.log("Streaming...\n");
     for await (const chunk of stream) {
       const chunkText = chunk.text();

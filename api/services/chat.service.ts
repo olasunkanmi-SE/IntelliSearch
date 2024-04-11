@@ -28,14 +28,10 @@ export class ChatService extends GenerativeAIService {
             {
               text: stripIndents`${oneLine` 
               Give a coincise answer
-              Examine the given context for any problems or challenges mentioned.
-              Consider how the MyBid project could potentially address or solve these issues based on the context provided.
-              If it's possible to deduce how MyBid intends to solve the issues, provide that information. If not, respond with "I don't know".
+              Examine and comprehend the given context.
               Avoid External Sources: Do not search for information outside of the given context to formulate your response.
               If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
               Here is the context: ${conversation.context}
-              Reminder: Please answer the following questions based solely on the context provided. Do not search for information outside of the given context. 
-              Reminder: If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
       `}`,
             },
           ],

@@ -20,6 +20,7 @@ export class ChatService extends GenerativeAIService {
 
   initChat = async (): Promise<ChatSession> => {
     const conversation = this.conversation;
+    console.log("hi", conversation.context);
     this.initialConvo = {
       history: [
         {
@@ -32,6 +33,10 @@ export class ChatService extends GenerativeAIService {
               Avoid External Sources: Do not search for information outside of the given context to formulate your response.
               If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
               Here is the context: ${conversation.context}
+              Remember: Avoid External Sources: Do not search for information outside of the given context to formulate your response, 
+              do not search the web.
+              If you cannot find any relevent information in relating to the Question, just answer I am sorry I dont know.
+              if ${conversation.context} does not contain any information just answer I am sorry I dont know.
       `}`,
             },
           ],

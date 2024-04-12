@@ -223,9 +223,9 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     const prompt = oneLine`
     when asked a compound question that contains multiple parts, 
     I want you to break it down into separate sub-queries that can be answered individually, 
-    the query should be broken down to at most 3 parts, return comma seperated queries.
+    the query should be broken down to at most 2 parts, return comma seperated queries.
     However if the question is a single question, straight forward query without multiple parts, 
-    Generate 2 additional comma seperated queries that are similar to this query and append the original query too: ${query}
+    Generate 1 additional comma seperated queries that are similar to this query and append the original query too: ${query}
     `;
     const result: GenerateContentResult = await aiModel.generateContent(prompt);
     const response: EnhancedGenerateContentResponse = result.response;

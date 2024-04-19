@@ -2,8 +2,8 @@ import DOMPurify from "dompurify";
 import { useState } from "react";
 import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { formatCodeBlocks, formatText } from "../utils";
 import NavBar from "./NavBar";
+import markdownIt from "markdown-it";
 
 interface IHistory {
   role: string;
@@ -127,7 +127,7 @@ export function Thread() {
                   <Card.Body key={i}>
                     <Card.Text
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(formatCodeBlocks(formatText(part.text))),
+                        __html: DOMPurify.sanitize(markdownIt().render(part.text)),
                       }}
                     ></Card.Text>
                   </Card.Body>

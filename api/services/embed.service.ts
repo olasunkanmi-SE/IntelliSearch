@@ -265,7 +265,12 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
    * @returns An array of query matches.
    * @throws {HttpException} if query embeddings could not be generated.
    **/
-  async getQueryMatches(query: string, matchCount: number, similarityThreshold: number): Promise<IQueryMatch[]> {
+  async getQueryMatches(
+    query: string,
+    matchCount: number,
+    similarityThreshold: number,
+    documentId: number
+  ): Promise<IQueryMatch[]> {
     const queryEmbeddings = await this.generateUserQueryEmbeddings(query);
     if (!queryEmbeddings?.length) {
       throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Unable to generate user query embeddings");
@@ -273,7 +278,7 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
     const embeddings = queryEmbeddings.map((embedding) =>
       //passing in the documentId here.
-      embeddingRepository.matchDocuments(embedding, matchCount, similarityThreshold)
+      embeddingRepository.matchDocuments(embedding, matchCount, similarityThreshold, documentId)
     );
     const matches = await Promise.all(embeddings);
     return matches.flat();

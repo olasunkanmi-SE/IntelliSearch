@@ -4,10 +4,17 @@ import { ChatController } from "./controllers/chat-controller";
 import { DocmentTypeController } from "./controllers/document-type.controller";
 import { DomainController } from "./controllers/domain.controller";
 import { EmbeddingController } from "./controllers/embed.controller";
+import { DocumentController } from "./controllers/document-controller";
 
 const port: number = Number(process.env.PORT) || 3000;
 const app = new App(
-  [new EmbeddingController(), new DomainController(), new DocmentTypeController(), new ChatController()],
+  [
+    new EmbeddingController(),
+    new DomainController(),
+    new DocmentTypeController(),
+    new ChatController(),
+    new DocumentController(),
+  ],
   port
 );
 app.listen();

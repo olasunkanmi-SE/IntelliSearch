@@ -5,6 +5,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import NavBar from "./NavBar";
 import markdownIt from "markdown-it";
 import Books from "./DropDown";
+import { IDocument } from "../interfaces/document.interface";
 
 interface IHistory {
   role: string;
@@ -17,6 +18,11 @@ export function Thread() {
   const [question, setQuestion] = useState("");
   const [chatHistory, setChatHistory] = useState<IHistory[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<IDocument>();
+
+  const handleBookSelect = (bookData: IDocument) => {
+    setSelectedBook(bookData);
+  };
 
   const formAction = async () => {
     if (!question) {
@@ -28,6 +34,7 @@ export function Thread() {
       setQuestion("");
       console.log(chatHistory);
       const response = await axiosPrivate.post("/chat", {
+        documentId: selectedBook?.id,
         question,
         chatHistory: JSON.stringify(chatHistory.slice(0, 4)),
       });
@@ -76,7 +83,7 @@ export function Thread() {
           <div style={{ marginTop: "20px" }}>
             <Stack direction="horizontal" gap={3}>
               <div className="p-2">
-                <Books />
+                <Books onBookSelect={handleBookSelect} />
               </div>
               <div className="p-2">
                 <Form onSubmit={handleSubmit}>
@@ -113,7 +120,7 @@ export function Thread() {
                   style={{
                     marginBottom: "10px",
                     marginTop: "10px",
-                    height: "70px",
+                    height: "30px",
                   }}
                 ></div>
                 <div
@@ -121,7 +128,7 @@ export function Thread() {
                   style={{
                     marginBottom: "10px",
                     marginTop: "10px",
-                    height: "140px",
+                    height: "70px",
                   }}
                 ></div>
               </>
@@ -131,8 +138,17 @@ export function Thread() {
           </div>
           <div>
             {chatHistory.map((chatItem, index) => (
-              <Card style={{ marginBottom: "10px", marginTop: "10px" }} key={index}>
-                <Card.Header>{chatItem.role && chatItem.role === "user" ? "Question" : "Answer"}</Card.Header>
+              <Card
+                style={{
+                  marginBottom: "10px",
+                  marginTop: "10px",
+                  backgroundColor: "#212529",
+                  color: "#fff",
+                  borderColor: `${chatItem.role && chatItem.role === "user" ? "" : "#2c2c29"}`,
+                  borderWidth: "medium",
+                }}
+                key={index}
+              >
                 {chatItem.parts.map((part, i) => (
                   <Card.Body key={i}>
                     <Card.Text

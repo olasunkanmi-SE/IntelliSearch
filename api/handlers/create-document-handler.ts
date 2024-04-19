@@ -4,7 +4,7 @@ import { DocumentRepository } from "../repositories/document.repository";
 import { ICreateDocumentDTO } from "../repositories/dtos/dtos";
 import { IDocumentModel } from "../repositories/model";
 
-export class DocumentHandler implements IRequestHandler<ICreateDocumentDTO, Result<IDocumentModel>> {
+export class CreateDocumentHandler implements IRequestHandler<ICreateDocumentDTO, Result<IDocumentModel>> {
   async handle(request: ICreateDocumentDTO): Promise<Result<IDocumentModel>> {
     try {
       let response: IDocumentModel | undefined;

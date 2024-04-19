@@ -6,25 +6,14 @@ import { EmbeddingService } from "../services/embed.service";
 import { getValue } from "../utils";
 import { CHAT_PARAMS } from "./../../presentation/src/constants";
 
-export class ChatHandler
-  implements
-    IRequestHandler<IChatRequestDTO, Result<Partial<IChatResponseDTO>>>
-{
+export class ChatHandler implements IRequestHandler<IChatRequestDTO, Result<Partial<IChatResponseDTO>>> {
   private readonly apiKey: string = getValue("API_KEY");
-  async handle({
-    question,
-    chatHistory,
-  }: IChatRequestDTO): Promise<Result<Partial<IChatResponseDTO>>> {
+  async handle({ question, chatHistory, documentId }: IChatRequestDTO): Promise<Result<Partial<IChatResponseDTO>>> {
     try {
-      const embeddingService: EmbeddingService = new EmbeddingService(
-        this.apiKey
-      );
+      const embeddingService: EmbeddingService = new EmbeddingService(this.apiKey);
       const { MATCH_COUNT, SIMILARITY_THRESHOLD } = CHAT_PARAMS;
-      const matches = await embeddingService.getQueryMatches(
-        question,
-        MATCH_COUNT,
-        SIMILARITY_THRESHOLD
-      );
+      //Query here
+      const matches = await embeddingService.getQueryMatches(question, MATCH_COUNT, SIMILARITY_THRESHOLD, documentId);
       // if (!matches?.length) {
       //   //take care of empty results here
       //   return "No matches for user query";

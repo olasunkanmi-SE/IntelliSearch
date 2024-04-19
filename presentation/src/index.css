@@ -29,15 +29,14 @@
 }
 
 body {
-  background-color: #f8f9fa;
+  background-color: #000;
 }
 
 .loader {
   position: relative;
-  background-color: rgb(235, 235, 235);
+  background-color: #4e575b;
   max-width: 100%;
   height: auto;
-  background: #efefee;
   overflow: hidden;
   border-radius: 4px;
   margin-bottom: 4px;
@@ -62,4 +61,12 @@ body {
   100% {
     transform: translateX(100%);
   }
+}
+
+pre {
+  border-radius: 4px;
+  padding: 10px;
+  overflow-x: auto;
+  background-color: #282c34;
+  color: rgb(97, 175, 239)
 }

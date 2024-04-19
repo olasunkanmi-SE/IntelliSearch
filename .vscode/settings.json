@@ -1,3 +1,7 @@
 {
-  "CodeGPT.apiKey": "CodeGPT Plus Beta"
+  "CodeGPT.apiKey": "CodeGPT Plus Beta",
+  "sonarlint.connectedMode.project": {
+    "connectionId": "olasunkanmi-se",
+    "projectKey": "olasunkanmi-SE_Vectorized-Intelligence"
+  }
 }

@@ -51,7 +51,7 @@ For detailed installation instructions, configuration options, and usage guideli
 
 ## Roadmap
 
-- [x] Intelligent search capabilities
+- [x] Intelligent question-and-answer capabilities
 - [x] Integration with a large language model (LLM)
 - [x] Efficient storage and retrieval of document embeddings
 - [ ] Metadata enrichment for enhanced categorization and filtering

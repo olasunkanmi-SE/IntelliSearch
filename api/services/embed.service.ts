@@ -272,6 +272,7 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     }
     const embeddingRepository: EmbeddingRepository = new EmbeddingRepository();
     const embeddings = queryEmbeddings.map((embedding) =>
+      //passing in the documentId here.
       embeddingRepository.matchDocuments(embedding, matchCount, similarityThreshold)
     );
     const matches = await Promise.all(embeddings);

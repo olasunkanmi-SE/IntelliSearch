@@ -4,6 +4,7 @@ import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap"
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import NavBar from "./NavBar";
 import markdownIt from "markdown-it";
+import Books from "./DropDown";
 
 interface IHistory {
   role: string;
@@ -25,9 +26,10 @@ export function Thread() {
     try {
       setLoading(true);
       setQuestion("");
+      console.log(chatHistory);
       const response = await axiosPrivate.post("/chat", {
         question,
-        chatHistory: JSON.stringify(chatHistory),
+        chatHistory: JSON.stringify(chatHistory.slice(0, 4)),
       });
       const data = response.data;
       setChatHistory((oldChat) => [
@@ -41,6 +43,7 @@ export function Thread() {
         },
         ...oldChat,
       ]);
+
       setLoading(false);
       return data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,25 +74,32 @@ export function Thread() {
         <Col></Col>
         <Col xs={6}>
           <div style={{ marginTop: "20px" }}>
-            <Form onSubmit={handleSubmit}>
-              <Stack direction="horizontal" gap={3}>
-                <Form.Control
-                  className="me-auto"
-                  type="text"
-                  name="message"
-                  placeholder="Ask me about MyBid"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                />
-                <Button variant="dark" onClick={formAction} disabled={loading}>
-                  Send
-                </Button>
-                <div className="vr" />
-                <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
-                  Reset
-                </Button>
-              </Stack>
-            </Form>
+            <Stack direction="horizontal" gap={3}>
+              <div className="p-2">
+                <Books />
+              </div>
+              <div className="p-2">
+                <Form onSubmit={handleSubmit}>
+                  <Stack direction="horizontal" gap={3}>
+                    <Form.Control
+                      className="me-auto"
+                      type="text"
+                      name="message"
+                      placeholder="Ask me about MyBid"
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                    />
+                    <Button variant="dark" onClick={formAction} disabled={loading}>
+                      Send
+                    </Button>
+                    <div className="vr" />
+                    <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
+                      Reset
+                    </Button>
+                  </Stack>
+                </Form>
+              </div>
+            </Stack>
           </div>
 
           <div style={{ color: "red" }}>

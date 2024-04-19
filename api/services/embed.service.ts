@@ -14,7 +14,7 @@ import { DocumentRepository } from "../repositories/document.repository";
 import { IDocumentModel, IDocumentTypeModel, IDomainModel } from "../repositories/model";
 import { getValue } from "../utils";
 import { EmbeddingRepository } from "./../repositories/embedding.repository";
-import { GenerativeAIService } from "./ai.service";
+import { GenerativeAIService } from "./generative-ai-service";
 import { DocumentTypeService } from "./document-type.service";
 import { DocumentService } from "./document.service";
 import { DomainService } from "./domain.service";

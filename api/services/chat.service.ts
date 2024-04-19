@@ -1,7 +1,7 @@
 import { ChatSession, CountTokensRequest, EnhancedGenerateContentResponse, Part } from "@google/generative-ai";
 import { oneLine, stripIndents } from "common-tags";
 import { AiModels } from "../lib/constants";
-import { GenerativeAIService } from "./ai.service";
+import { GenerativeAIService } from "./generative-ai-service";
 import { IChatResponseDTO, IHistory } from "../repositories/dtos/dtos";
 
 export class ChatService extends GenerativeAIService {

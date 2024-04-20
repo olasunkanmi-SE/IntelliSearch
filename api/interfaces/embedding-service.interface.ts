@@ -6,7 +6,7 @@ import { IQueryMatch } from "./generic-interface";
 export interface IEmbeddingService {
   generateEmbeddings(
     taskType: TaskType,
-    role?: string,
+    role?: string
   ): Promise<{
     embedding: number[];
     text: string;
@@ -16,11 +16,12 @@ export interface IEmbeddingService {
   createDocumentsEmbeddings(
     title: string,
     documentType: DocumentTypeEnum,
-    domain: DomainEnum,
+    domain: DomainEnum
   ): Promise<Result<boolean>>;
   getQueryMatches(
     query: string,
     matchCount: number,
     similarityThreshold: number,
+    documentId: number
   ): Promise<IQueryMatch[]>;
 }

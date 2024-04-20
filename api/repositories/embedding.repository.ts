@@ -132,7 +132,14 @@ export class EmbeddingRepository extends Database {
   /**
    * Queries the database for listings that are similar to a given embedding.
    */
-  async matchDocuments(embedding: any, matchCount: number, matchThreshold: number): Promise<IQueryMatch[]> {
+  //Raw query failed. Code: `42601`. Message: `ERROR: syntax error at or near "WHERE"`
+  async matchDocuments(
+    embedding: any,
+    matchCount: number,
+    matchThreshold: number,
+    documentId: number
+  ): Promise<IQueryMatch[]> {
+    console.log({ documentId });
     //change text to document_embedding
     //check how to select textembedding from DB
     const matches = await this.prisma.$queryRaw`
@@ -141,7 +148,9 @@ export class EmbeddingRepository extends Database {
             1 - ("textEmbedding" <=> ${embedding}::vector) as similarity
         FROM 
             "Embeddings"
-        WHERE 
+        WHERE
+            "documentId" = ${documentId}
+        AND 
             1 - ("textEmbedding" <=> ${embedding}::vector) > ${matchThreshold}
         ORDER BY 
             similarity DESC

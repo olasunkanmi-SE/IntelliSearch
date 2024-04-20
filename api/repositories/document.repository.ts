@@ -17,10 +17,7 @@ export class DocumentRepository extends Database {
       //In your instructiona prompt, ask the AI to genrate code if any is available
       const docExists: IDocumentModel = await this.findOne(title);
       if (docExists) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "document already exists",
-        );
+        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "document already exists");
       }
       return await this.prisma.documents.create({
         data: {
@@ -39,6 +36,14 @@ export class DocumentRepository extends Database {
           title,
         },
       });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getDocuments(): Promise<IDocumentModel[]> {
+    try {
+      return await this.prisma.documents.findMany();
     } catch (error) {
       console.error(error);
     }

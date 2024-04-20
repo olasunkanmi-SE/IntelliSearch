@@ -27,6 +27,7 @@ export interface ICreateDocumentTypeRequestDTO {
 }
 
 export interface IChatRequestDTO {
+  documentId: number;
   question: string;
   metaData?: {
     documentId: number;

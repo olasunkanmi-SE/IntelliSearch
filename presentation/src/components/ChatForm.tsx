@@ -1,6 +1,6 @@
 import DOMPurify from "dompurify";
 import { useState } from "react";
-import { Button, Card, Container, Form, Row } from "react-bootstrap";
+import { Button, Card, Container, Form, ListGroup, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import NavBar from "./NavBar";
 import markdownIt from "markdown-it";
@@ -79,14 +79,30 @@ export function Thread() {
         <NavBar />
       </Row>
       <Row>
-        <div className="col-lg-1 col-md-4 col-sm-6">
-          <div style={{ marginTop: "20px" }}>
-            <div>
-              <Books onBookSelect={handleBookSelect} />
-            </div>
-          </div>
-        </div>
+        <div className="col-lg-1 col-md-4 col-sm-6"></div>
         <div className="col-lg-8 col-md-4 col-sm-6">
+          <Stack direction="horizontal" gap={3}>
+            <div className="p-2"></div>
+            <div className="p-2 ms-auto">
+              <div>
+                <Books onBookSelect={handleBookSelect} />
+              </div>
+            </div>
+            <div className="p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                className="bi bi-gear-fill"
+                viewBox="0 0 16 16"
+                color="#fff"
+              >
+                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+              </svg>
+            </div>
+          </Stack>
+
           <div style={{ marginTop: "20px" }}>
             <div>
               <Form onSubmit={handleSubmit} className="d-flex">
@@ -99,10 +115,10 @@ export function Thread() {
                   onChange={(e) => setQuestion(e.target.value)}
                 />
                 <Button variant="dark" onClick={formAction} disabled={loading}>
-                  Send
+                  Ask
                 </Button>
                 <div className="vr mx-2" />
-                <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
+                <Button variant="outline-info" onClick={clearChat} disabled={loading}>
                   Reset
                 </Button>
               </Form>
@@ -162,13 +178,54 @@ export function Thread() {
             ))}
           </div>
         </div>
-        <div className="col-lg-3 col-md-4 col-sm-6">
-          <div
-            style={{
-              marginTop: "50%",
-            }}
-          >
-            <FileUploader />
+        <div style={{ width: "18rem" }} className="col-lg-3 col-md-4 col-sm-6">
+          <div style={{ marginTop: "10px" }}>
+            <Card style={{ backgroundColor: "#000", borderColor: "#fff", color: "#fff" }}>
+              <Card.Body>
+                <Card.Title>IntelliSearch</Card.Title>
+                <div style={{ marginBottom: "10px" }}>
+                  <Button style={{ color: "#fff" }} variant="outline-success">
+                    Sign Up to Use Application
+                  </Button>
+                </div>
+                <Card.Text>
+                  A gemini API key is required to use this service. Sign up with your gmail to get a key.
+                </Card.Text>
+                <Button style={{ color: "#fff" }} variant="outline-success">
+                  Get your Gemini API Key
+                </Button>
+              </Card.Body>
+            </Card>
+          </div>
+          <div style={{ marginTop: "10px", color: "#fff" }}>
+            <h5>Books</h5>
+            <ListGroup style={{ backgroundColor: "none" }}>
+              <ListGroup.Item>Designing data intensive applications</ListGroup.Item>
+              <ListGroup.Item>MyBid white paper</ListGroup.Item>
+              <ListGroup.Item>Microservices Design</ListGroup.Item>
+              <ListGroup.Item>The pregmatic Engineer</ListGroup.Item>
+              <ListGroup.Item>Software development at Google</ListGroup.Item>
+            </ListGroup>
+          </div>
+          <div>
+            <Card style={{ marginTop: "10px", backgroundColor: "#000" }}>
+              <Card.Body>
+                <FileUploader />
+              </Card.Body>
+            </Card>
+          </div>
+          <div style={{ marginTop: "10px" }}>
+            <Card style={{ backgroundColor: "#000", borderColor: "#fff", color: "#fff" }}>
+              <Card.Body>
+                <Card.Title>Function Calling</Card.Title>
+                <Card.Text>
+                  Gemini function calling allows you to directly query our Ecommerce database and get insight
+                </Card.Text>
+                <Button style={{ color: "#fff" }} variant="outline-info">
+                  coming soon
+                </Button>
+              </Card.Body>
+            </Card>
           </div>
         </div>
       </Row>

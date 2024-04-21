@@ -1,6 +1,6 @@
 
 
-<img width="1222" alt="Retrieval Augmented Generator project, intellisearch by Oyinlola Olasunkanmi Raymond" src="https://github.com/olasunkanmi-SE/IntelliSearch/assets/60177090/7eb9f525-b603-49f1-867c-197449e4bd88">
+<img width="1222" alt=" Retrieval Augmented Generator project, intelliSearch, by Oyinlola Olasunkanmi Raymond" src="https://github.com/olasunkanmi-SE/IntelliSearch/assets/60177090/7eb9f525-b603-49f1-867c-197449e4bd88">
 
 # IntelliSearch
 

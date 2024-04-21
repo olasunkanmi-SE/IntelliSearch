@@ -1,5 +1,6 @@
 
-![intellisearch-in-action](https://github.com/olasunkanmi-SE/IntelliSearch/assets/60177090/7eb9f525-b603-49f1-867c-197449e4bd88)
+
+<img width="1222" alt="Retrieval Augmented Generator project, intellisearch by Oyinlola Olasunkanmi Raymond" src="https://github.com/olasunkanmi-SE/IntelliSearch/assets/60177090/7eb9f525-b603-49f1-867c-197449e4bd88">
 
 # IntelliSearch
 
@@ -69,5 +70,5 @@ For detailed installation instructions, configuration options, and usage guideli
 We welcome contributions to enhance IntelliSearch and make it even more powerful. If you encounter any issues, have suggestions for improvements, or want to add new features, please open an issue or submit a pull request. Let's collaborate and make IntelliSearch the go-to solution for intelligent question answering and content recommendation!
 
 ## Architecture
-<img width="1222" alt="RAG_workflow" src="https://github.com/olasunkanmi-SE/Vectorized-Intelligence/assets/60177090/d1f6495d-8245-400b-ba20-a520c7200950">
+<img width="1222" alt="Retrieval Augmented Generator project, intellisearch by Oyinlola Olasunkanmi Raymond" src="https://github.com/olasunkanmi-SE/Vectorized-Intelligence/assets/60177090/d1f6495d-8245-400b-ba20-a520c7200950">
 

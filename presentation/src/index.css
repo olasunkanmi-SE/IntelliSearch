@@ -73,7 +73,7 @@ pre {
 }
 
 .dropzone {
-  border: 2px dashed #ccc;
+  border: 2px dashed #ffffff;
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -82,7 +82,7 @@ pre {
 }
 
 .dropzone:hover {
-  background-color: #f5f5f5;
+  background-color: #000000;
 }
 
 .dropzone.active {
@@ -98,4 +98,13 @@ pre {
 
 .dropzone input {
   display: none;
+}
+
+.list-group {
+  --bs-list-group-bg: #000 !important;
+  --bs-list-group-color: #fff
+}
+
+.list-group-item {
+  border: var(--bs-list-group-border-width) solid #0dcaf0
 }

@@ -1,3 +1,6 @@
+
+![intellisearch-in-action](https://github.com/olasunkanmi-SE/IntelliSearch/assets/60177090/7eb9f525-b603-49f1-867c-197449e4bd88)
+
 # IntelliSearch
 
 IntelliSearch is an advanced retrieval-based question-answering and recommendation system that leverages embeddings and a large language model (LLM) to provide accurate and relevant information to users. With its intelligent search capabilities and future recommendation features, IntelliSearch aims to be a comprehensive solution for extracting knowledge and discovering personalized content from a vast corpus of documents.

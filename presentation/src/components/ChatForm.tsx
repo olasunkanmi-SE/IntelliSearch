@@ -1,11 +1,12 @@
 import DOMPurify from "dompurify";
 import { useState } from "react";
-import { Button, Card, Col, Container, Form, Row, Stack } from "react-bootstrap";
+import { Button, Card, Container, Form, Row } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import NavBar from "./NavBar";
 import markdownIt from "markdown-it";
 import Books from "./DropDown";
 import { IDocument } from "../interfaces/document.interface";
+import FileUploader from "./DragAndDrop";
 
 interface IHistory {
   role: string;
@@ -73,40 +74,39 @@ export function Thread() {
   };
 
   return (
-    <Container>
+    <Container style={{ overflow: "hidden" }} fluid>
       <Row>
         <NavBar />
       </Row>
       <Row>
-        <Col></Col>
-        <Col xs={6}>
+        <div className="col-lg-1 col-md-4 col-sm-6">
           <div style={{ marginTop: "20px" }}>
-            <Stack direction="horizontal" gap={3}>
-              <div className="p-2">
-                <Books onBookSelect={handleBookSelect} />
-              </div>
-              <div className="p-2">
-                <Form onSubmit={handleSubmit}>
-                  <Stack direction="horizontal" gap={3}>
-                    <Form.Control
-                      className="me-auto"
-                      type="text"
-                      name="message"
-                      placeholder="Ask me about MyBid"
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                    />
-                    <Button variant="dark" onClick={formAction} disabled={loading}>
-                      Send
-                    </Button>
-                    <div className="vr" />
-                    <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
-                      Reset
-                    </Button>
-                  </Stack>
-                </Form>
-              </div>
-            </Stack>
+            <div>
+              <Books onBookSelect={handleBookSelect} />
+            </div>
+          </div>
+        </div>
+        <div className="col-lg-8 col-md-4 col-sm-6">
+          <div style={{ marginTop: "20px" }}>
+            <div>
+              <Form onSubmit={handleSubmit} className="d-flex">
+                <Form.Control
+                  type="text"
+                  name="message"
+                  className="me-2"
+                  placeholder="Select a Book and ask me questions"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                />
+                <Button variant="dark" onClick={formAction} disabled={loading}>
+                  Send
+                </Button>
+                <div className="vr mx-2" />
+                <Button variant="outline-danger" onClick={clearChat} disabled={loading}>
+                  Reset
+                </Button>
+              </Form>
+            </div>
           </div>
 
           <div style={{ color: "red" }}>
@@ -161,8 +161,16 @@ export function Thread() {
               </Card>
             ))}
           </div>
-        </Col>
-        <Col></Col>
+        </div>
+        <div className="col-lg-3 col-md-4 col-sm-6">
+          <div
+            style={{
+              marginTop: "50%",
+            }}
+          >
+            <FileUploader />
+          </div>
+        </div>
       </Row>
     </Container>
   );

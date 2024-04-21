@@ -30,6 +30,7 @@
 
 body {
   background-color: #000;
+  width: 100%;
 }
 
 .loader {
@@ -69,4 +70,32 @@ pre {
   overflow-x: auto;
   background-color: #282c34;
   color: rgb(97, 175, 239)
+}
+
+.dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dropzone:hover {
+  background-color: #f5f5f5;
+}
+
+.dropzone.active {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+}
+
+.dropzone p {
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.dropzone input {
+  display: none;
 }

@@ -2,12 +2,13 @@ import React from "react";
 import { useDropzone, DropzoneOptions } from "react-dropzone";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
+//I Want it to only allow upload of PDF
 export const FileUploader: React.FC = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const handleFileUpload = async (file: File) => {
-    const formData = createFormData(file);
     try {
+      const formData = createFormData(file);
       const response = await uploadFileToServer(formData);
       console.log("File uploaded successfully:", response.data.message);
     } catch (error) {
@@ -17,7 +18,12 @@ export const FileUploader: React.FC = () => {
 
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      handleFileUpload(acceptedFiles[0]);
+      const file = acceptedFiles[0];
+      if (file.type !== "application/pdf") {
+        throw new Error("Only PDF files are allowed");
+      }
+      console.log("File uploaded:", file);
+      handleFileUpload(file);
     }
   };
 

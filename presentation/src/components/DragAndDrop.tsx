@@ -1,31 +1,37 @@
 import React from "react";
 import { useDropzone, DropzoneOptions } from "react-dropzone";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-// interface UploadResponse {
-//   // Define the structure of the API response
-//   message: string;
-//   // Add more properties as needed
-// }
+export const FileUploader: React.FC = () => {
+  const axiosPrivate = useAxiosPrivate();
 
-const FileUploader: React.FC = () => {
-  const onDrop = async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      const formData = new FormData();
-      formData.append("pdf", file);
-      console.log(file);
-
-      //   try {
-      //     const response = await axios.post<UploadResponse>("https://api.example.com/upload", formData, {
-      //       headers: {
-      //         "Content-Type": "multipart/form-data",
-      //       },
-      //     });
-      //     console.log("File uploaded successfully:", response.data.message);
-      //   } catch (error) {
-      //     console.error("Error uploading file:", error);
-      //   }
+  const handleFileUpload = async (file: File) => {
+    const formData = createFormData(file);
+    try {
+      const response = await uploadFileToServer(formData);
+      console.log("File uploaded successfully:", response.data.message);
+    } catch (error) {
+      console.error("Error uploading file:", error);
     }
+  };
+
+  const onDrop = (acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      handleFileUpload(acceptedFiles[0]);
+    }
+  };
+
+  const createFormData = (file: File) => {
+    const formData = new FormData();
+    formData.append("pdf", file);
+    return formData;
+  };
+
+  const uploadFileToServer = async (formData: FormData) => {
+    const url = "/embed/documents";
+    const headers = { "Content-Type": "multipart/form-data" };
+    const response = await axiosPrivate.post(url, formData, { headers });
+    return response;
   };
 
   const options: DropzoneOptions = {
@@ -47,5 +53,3 @@ const FileUploader: React.FC = () => {
     </div>
   );
 };
-
-export default FileUploader;

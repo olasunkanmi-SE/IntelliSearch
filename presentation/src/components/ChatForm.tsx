@@ -1,12 +1,12 @@
 import DOMPurify from "dompurify";
+import markdownIt from "markdown-it";
 import { useState } from "react";
 import { Button, Card, Container, Form, ListGroup, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import NavBar from "./NavBar";
-import markdownIt from "markdown-it";
-import Books from "./DropDown";
 import { IDocument } from "../interfaces/document.interface";
-import FileUploader from "./DragAndDrop";
+import { FileUploader } from "./DragAndDrop";
+import Books from "./DropDown";
+import NavBar from "./NavBar";
 
 interface IHistory {
   role: string;

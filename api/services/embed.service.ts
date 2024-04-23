@@ -62,7 +62,7 @@ or product manuals to create a searchable knowledge base for customer support or
 export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
   constructor(
     apiKey: string,
-    private file: Buffer
+    private readonly file?: Buffer
   ) {
     super(apiKey);
   }

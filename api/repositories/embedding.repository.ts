@@ -139,7 +139,6 @@ export class EmbeddingRepository extends Database {
     matchThreshold: number,
     documentId: number
   ): Promise<IQueryMatch[]> {
-    console.log({ documentId });
     //change text to document_embedding
     //check how to select textembedding from DB
     const matches = await this.prisma.$queryRaw`

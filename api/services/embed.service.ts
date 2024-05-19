@@ -232,7 +232,6 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     const result: GenerateContentResult = await aiModel.generateContent(prompt);
     const response: EnhancedGenerateContentResponse = result.response;
     const text: string = response.text();
-    console.log(text);
     return text;
   }
 

@@ -35,6 +35,7 @@ export class EmbeddingController {
       }
       return res.json(result);
     } catch (error) {
+      next(error);
       generateErrorResponse(error, res, next);
     }
   }

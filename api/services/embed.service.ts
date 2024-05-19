@@ -60,8 +60,10 @@ of information. For example, you could use this task type to embed articles, FAQ
 or product manuals to create a searchable knowledge base for customer support or information retrieval systems.*/
 
 export class EmbeddingService extends GenerativeAIService implements IEmbeddingService {
-  documentPath: string = getValue("PDF_ABSOLUTE_PATH");
-  constructor(apiKey: string) {
+  constructor(
+    apiKey: string,
+    private readonly file?: Buffer
+  ) {
     super(apiKey);
   }
   /**
@@ -194,10 +196,10 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
   async createContentEmbeddings(): Promise<{ text: string; embeddings?: number[] }[]> {
     const documentService: IDocumentService = new DocumentService();
     let text: string;
-    if (!this.documentPath.length) {
+    if (!this.file.length) {
       throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "Could not read PDF file");
     }
-    text = await documentService.convertPDFToText(this.documentPath);
+    text = await documentService.convertPDFToText(this.file);
     const chunks: string[] = documentService.breakTextIntoChunks(text, 2000);
 
     const contentEmbed = chunks.map(

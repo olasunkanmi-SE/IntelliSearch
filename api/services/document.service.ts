@@ -3,10 +3,9 @@ import pdf from "pdf-parse";
 import { IDocumentService } from "../interfaces/document-service.interface";
 
 export class DocumentService implements IDocumentService {
-  async convertPDFToText(pdfFilePath: string): Promise<string> {
+  async convertPDFToText(file: Buffer): Promise<string> {
     try {
-      const dataBuffer = fs.readFileSync(pdfFilePath);
-      const data = await pdf(dataBuffer);
+      const data = await pdf(file);
       const text = this.formatText(data.text);
       return text;
     } catch (error) {

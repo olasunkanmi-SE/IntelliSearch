@@ -1,12 +1,13 @@
 import DOMPurify from "dompurify";
+import markdownIt from "markdown-it";
 import { useState } from "react";
 import { Button, Card, Container, Form, ListGroup, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import NavBar from "./NavBar";
-import markdownIt from "markdown-it";
-import Books from "./DropDown";
 import { IDocument } from "../interfaces/document.interface";
-import FileUploader from "./DragAndDrop";
+import { FileUploader } from "./DragAndDrop";
+import Books from "./DropDown";
+import NavBar from "./NavBar";
+import Example from "./Modal";
 
 interface IHistory {
   role: string;
@@ -179,6 +180,9 @@ export function Thread() {
           </div>
         </div>
         <div style={{ width: "18rem" }} className="col-lg-3 col-md-4 col-sm-6">
+          <div>
+            <Example />
+          </div>
           <div style={{ marginTop: "10px" }}>
             <Card style={{ backgroundColor: "#000", borderColor: "#fff", color: "#fff" }}>
               <Card.Body>

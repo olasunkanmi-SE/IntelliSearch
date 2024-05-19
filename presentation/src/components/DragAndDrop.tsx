@@ -2,7 +2,6 @@ import React from "react";
 import { useDropzone, DropzoneOptions } from "react-dropzone";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-//I Want it to only allow upload of PDF
 export const FileUploader: React.FC = () => {
   const axiosPrivate = useAxiosPrivate();
 

@@ -3,7 +3,7 @@ import markdownIt from "markdown-it";
 import { useState } from "react";
 import { Button, Card, Container, Form, ListGroup, Row, Stack } from "react-bootstrap";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { IDocument } from "../interfaces/document.interface";
+import { IDataItem } from "../interfaces/document.interface";
 import { FileUploader } from "./DragAndDrop";
 import Books from "./DropDown";
 import NavBar from "./NavBar";
@@ -20,9 +20,9 @@ export function Thread() {
   const [question, setQuestion] = useState("");
   const [chatHistory, setChatHistory] = useState<IHistory[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedBook, setSelectedBook] = useState<IDocument>();
+  const [selectedBook, setSelectedBook] = useState<IDataItem>();
 
-  const handleBookSelect = (bookData: IDocument) => {
+  const handleBookSelect = (bookData: IDataItem) => {
     setSelectedBook(bookData);
   };
 
@@ -86,7 +86,7 @@ export function Thread() {
             <div className="p-2"></div>
             <div className="p-2 ms-auto">
               <div>
-                <Books onBookSelect={handleBookSelect} />
+                <Books onDataItemSelect={handleBookSelect} model="document" />
               </div>
             </div>
             <div className="p-2">

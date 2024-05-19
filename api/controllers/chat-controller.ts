@@ -18,7 +18,7 @@ export class ChatController {
     try {
       const { question, chatHistory, documentId } = chatRequestSchema.parse(req.body);
       const chatHandler = new ChatHandler();
-      const history = chatHistorySchema.parse(JSON.parse(chatHistory));
+      const history = chatHistory ? chatHistorySchema.parse(JSON.parse(chatHistory)) : [];
       const data = await chatHandler.handle({ question, chatHistory: history, documentId });
       if (data) {
         const result = Result.ok(data.getValue());

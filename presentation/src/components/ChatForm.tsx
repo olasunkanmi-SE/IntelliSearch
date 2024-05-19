@@ -86,7 +86,7 @@ export function Thread() {
             <div className="p-2"></div>
             <div className="p-2 ms-auto">
               <div>
-                <Books onDataItemSelect={handleBookSelect} model="document" />
+                <Books onDataItemSelect={handleBookSelect} model="documents" />
               </div>
             </div>
             <div className="p-2">

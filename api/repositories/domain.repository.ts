@@ -13,10 +13,7 @@ export class DomainRepository extends Database {
     try {
       const exists: IDomainModel = await this.findOne(name);
       if (exists) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "domain already exists",
-        );
+        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "domain already exists");
       }
       return await this.prisma.domains.create({
         data: {
@@ -46,6 +43,14 @@ export class DomainRepository extends Database {
       return result.count > 0 ? result : { count: 0 };
     } catch (error) {
       console.error("unable to insert many docs", error);
+    }
+  }
+
+  async getDocumentDomain(): Promise<IDomainModel[]> {
+    try {
+      return await this.prisma.domains.findMany();
+    } catch (error) {
+      console.error(error);
     }
   }
 }

@@ -6,9 +6,8 @@ import { IDocumentModel } from "../repositories/model";
 export class GetDocumentsHandler implements IRequestHandler<{}, Result<IDocumentModel[]>> {
   async handle(): Promise<Result<IDocumentModel[]>> {
     try {
-      let response: IDocumentModel[];
       const documentRespository: DocumentRepository = new DocumentRepository();
-      response = await documentRespository.getDocuments();
+      const response: IDocumentModel[] = await documentRespository.getDocuments();
       return Result.ok(response);
     } catch (error) {
       console.error(error);

@@ -3,6 +3,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { IDataItem } from "../interfaces/document.interface";
 import { getLocalStorageData, setLocalStorageData } from "../utils";
+import { MODEL_URLS, MODELS } from "../constants";
 
 interface IBookProps {
   onDataItemSelect: (data: IDataItem) => void;
@@ -34,7 +35,20 @@ function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getDataItems = async (model: string): Promise<any> => {
-    const response = await axiosPrivate.get(`/${model}`);
+    let url = "";
+    const models = Object.keys(MODEL_URLS);
+    if (models.includes(model)) {
+      if (model === MODELS.document) {
+        url = MODEL_URLS.document;
+      }
+      if (model === MODELS.domain) {
+        url = MODEL_URLS.domain;
+      }
+      if (model === MODELS.documentType) {
+        url = MODEL_URLS.documentType;
+      }
+    }
+    const response = await axiosPrivate.get(url);
     return response ? response.data.data : [];
   };
 

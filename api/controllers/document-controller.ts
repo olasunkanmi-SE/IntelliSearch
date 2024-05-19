@@ -21,8 +21,9 @@ export class DocumentController {
       const data = await documentHandler.handle();
       if (data) {
         const result = Result.ok(data.getValue());
-        res.status(200).json(result);
+        return res.status(200).json(result);
       }
+      return res.status(400).json(Result.fail("Unable to retrieve documents", 400));
     } catch (error) {
       generateErrorResponse(error, res, next);
       next(error);

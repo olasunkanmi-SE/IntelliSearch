@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { IDataItem } from "../interfaces/document.interface";
+import { getLocalStorageData, setLocalStorageData } from "../utils";
 
 interface IBookProps {
   onDataItemSelect: (data: IDataItem) => void;
@@ -11,26 +12,19 @@ interface IBookProps {
 function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
   const axiosPrivate = useAxiosPrivate();
   const [selectedDataItems, setSelectedDataItems] = useState<string>("Select Book");
-  const [dataItems, setDataItems] = useState<IDataItem[]>([]);
+  const [dataItems, setDataItems] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response;
-        switch (model) {
-          case "document":
-            response = await axiosPrivate.get("/documents");
-            break;
-          case "documentType":
-            response = await axiosPrivate.get("/documents");
-            break;
-          case "domain":
-            response = await axiosPrivate.get("/documents");
-            break;
-          default:
-            break;
+        const storageData = getLocalStorageData(`key-${model}`, true);
+        if (!storageData) {
+          const apiData = await getDataItems(model);
+          setDataItems(apiData);
+          setLocalStorageData(`key-${model}`, JSON.stringify(apiData), true);
+        } else {
+          setDataItems(JSON.parse(storageData));
         }
-        setDataItems(response?.data.data);
       } catch (error) {
         console.error(error);
       }
@@ -38,12 +32,18 @@ function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
     fetchData();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getDataItems = async (model: string): Promise<any> => {
+    const response = await axiosPrivate.get(`/${model}`);
+    return response ? response.data.data : [];
+  };
+
   const handleSelect = async (eventKey: string | null) => {
     if (eventKey) {
       setSelectedDataItems(eventKey);
-      const selectedBookData = dataItems.find((book: { title: string }) => book.title === eventKey);
-      if (selectedBookData) {
-        onDataItemSelect(selectedBookData);
+      const selectedItemData = dataItems.find((item: { title: string }) => item.title === eventKey);
+      if (selectedItemData) {
+        onDataItemSelect(selectedItemData);
       }
     }
   };

@@ -2,7 +2,7 @@ name: CI for restaurant
 
 on:
   pull_request:
-    branches: [main, development]
+    branches: [main, test]
 
 jobs:
   build:
@@ -23,11 +23,11 @@ jobs:
           npm run format
           npm run test:unit
           npm run test:coverage
-      -   name: ci for frontend
-          working-directory: ./presentation
-          run: |
-            npm i
-            npm run build
+      - name: ci for frontend
+        working-directory: ./presentation
+        run: |
+          npm i
+          npm run build
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:

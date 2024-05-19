@@ -7,11 +7,11 @@ export enum CHAT_PARAMS {
 export enum MODEL_URLS {
   document = "/documents",
   domain = "/domain",
-  documentType = "/docum",
+  documentType = "/document/type",
 }
 
 export enum MODELS {
   document = "document",
   domain = "domain",
-  documentType = "/documentType",
+  documentType = "documentType",
 }

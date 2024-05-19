@@ -14,10 +14,7 @@ export class DocumentTypeRepository extends Database {
     try {
       const exists: IDocumentTypeModel = await this.findOne(name);
       if (exists) {
-        throw new HttpException(
-          HTTP_RESPONSE_CODE.BAD_REQUEST,
-          "document type already exists",
-        );
+        throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "document type already exists");
       }
       return await this.prisma.documentTypes.create({
         data: {
@@ -47,6 +44,14 @@ export class DocumentTypeRepository extends Database {
       return result.count > 0 ? result : { count: 0 };
     } catch (error) {
       console.error("unable to insert many docs", error);
+    }
+  }
+
+  async getDocumentType(): Promise<IDocumentTypeModel[]> {
+    try {
+      return await this.prisma.documentTypes.findMany();
+    } catch (error) {
+      console.error(error);
     }
   }
 }

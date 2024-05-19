@@ -1,16 +1,11 @@
-import { DomainRepository } from "./../repositories/domain.repository";
+import { DomainRepository } from "../repositories/domain.repository";
 import { IRequestHandler } from "../interfaces/handler";
 import { Result } from "../lib/result";
 import { ICreateDomainRequestDTO } from "../repositories/dtos/dtos";
 import { IDomainModel } from "../repositories/model";
 
-export class DomainHandler
-  implements
-    IRequestHandler<ICreateDomainRequestDTO, Result<IDomainModel | undefined>>
-{
-  async handle(
-    request: ICreateDomainRequestDTO,
-  ): Promise<Result<IDomainModel | undefined>> {
+export class CreateDomainHandler implements IRequestHandler<ICreateDomainRequestDTO, Result<IDomainModel | undefined>> {
+  async handle(request: ICreateDomainRequestDTO): Promise<Result<IDomainModel | undefined>> {
     try {
       let response: IDomainModel | undefined;
       const { name } = request;

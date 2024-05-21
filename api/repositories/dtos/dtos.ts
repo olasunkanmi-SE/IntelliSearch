@@ -14,8 +14,8 @@ export interface ICreateEmbeddingDTO {
 
 export interface ICreateEmbeddingRequestDTO {
   title: string;
-  documentType: DocumentTypeEnum;
-  domain: DomainEnum;
+  documentTypeId: number;
+  domainId: number;
 }
 
 export interface ICreateDomainRequestDTO {

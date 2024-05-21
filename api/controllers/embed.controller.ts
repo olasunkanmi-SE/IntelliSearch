@@ -22,13 +22,14 @@ export class EmbeddingController {
     }
     const file = req.file;
     const { buffer } = file;
-    const embeddingHandler: CreateDocumentEmbeddingHandler = new CreateDocumentEmbeddingHandler(buffer);
     try {
-      const { title, documentType, domain } = documentRequestSchema.parse(req.body);
+      const metaData = JSON.parse(req.body.other);
+      const embeddingHandler: CreateDocumentEmbeddingHandler = new CreateDocumentEmbeddingHandler(buffer);
+      const { title, documentTypeId, domainId } = documentRequestSchema.parse(metaData);
       const result = await embeddingHandler.handle({
         title,
-        documentType,
-        domain,
+        documentTypeId,
+        domainId,
       });
       if (!result?.isSuccess) {
         return res.json(Result.fail("unable to create embeddings", 400));

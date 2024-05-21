@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { useDropzone, DropzoneOptions } from "react-dropzone";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { DropzoneOptions, useDropzone } from "react-dropzone";
 import { AppModal } from "./Modal";
 
 export const FileUploader: React.FC = () => {
-  const axiosPrivate = useAxiosPrivate();
-
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const [pdf, setPdf] = useState<File>();
@@ -18,16 +15,6 @@ export const FileUploader: React.FC = () => {
     setShowModal(false);
   };
 
-  const handleFileUpload = async (file: File) => {
-    try {
-      const formData = createFormData(file);
-      const response = await uploadFileToServer(formData);
-      console.log("File uploaded successfully:", response.data.message);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
-  };
-
   const onDrop = async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
@@ -37,22 +24,8 @@ export const FileUploader: React.FC = () => {
         }
         setPdf(file);
         handleShowModal();
-        await handleFileUpload(file);
       }
     }
-  };
-
-  const createFormData = (file: File) => {
-    const formData = new FormData();
-    formData.append("pdf", file);
-    return formData;
-  };
-
-  const uploadFileToServer = async (formData: FormData) => {
-    const url = "/embed/documents";
-    const headers = { "Content-Type": "multipart/form-data" };
-    const response = await axiosPrivate.post(url, formData, { headers });
-    return response;
   };
 
   const options: DropzoneOptions = {

@@ -5,14 +5,22 @@ import Modal from "react-bootstrap/Modal";
 import { DropDown } from "./DropDown";
 import { IDataItem } from "../interfaces/document.interface";
 import { Stack } from "react-bootstrap";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 interface IModalProps {
   show: boolean;
   onHide: () => void;
   pdfData?: File;
 }
+interface IInputInterface {
+  author: string;
+  title: string;
+  documentTypeId: number;
+  domainId: number;
+}
 //pass in the PDF data and append to the form data
-export const AppModal: React.FC<IModalProps> = ({ show, onHide }: IModalProps) => {
+export const AppModal: React.FC<IModalProps> = ({ show, onHide, pdfData }: IModalProps) => {
+  const axiosPrivate = useAxiosPrivate();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDomain, setSelectedDomain] = useState<IDataItem>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,6 +33,16 @@ export const AppModal: React.FC<IModalProps> = ({ show, onHide }: IModalProps) =
     documentAuthor: "",
   });
 
+  const inputMapper = (formData: typeof formInputData): IInputInterface => {
+    const { documentAuthor, documentTitle, documentType, domain } = formData;
+    return {
+      author: documentAuthor,
+      title: documentTitle,
+      documentTypeId: Number(documentType),
+      domainId: Number(domain),
+    };
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormInputData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -32,8 +50,25 @@ export const AppModal: React.FC<IModalProps> = ({ show, onHide }: IModalProps) =
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form data:", formInputData);
+    const data = inputMapper(formInputData);
+    console.log({ data });
+    uploadFileToServer(data);
   };
+
+  const uploadFileToServer = async (formData: IInputInterface) => {
+    try {
+      const url = "/embed/documents";
+      const headers = { "Content-Type": "multipart/form-data" };
+      const formDataToString = JSON.stringify(formData);
+      const response = await axiosPrivate.post(url, { other: formDataToString, pdf: pdfData }, { headers });
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  //the formData values are sent as a string, even though some values are number
 
   const handleSelectedDomainItem = (itemData: IDataItem) => {
     setSelectedDomain(itemData);

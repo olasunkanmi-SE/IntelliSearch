@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { IDataItem } from "../interfaces/document.interface";
-import { getLocalStorageData, setLocalStorageData } from "../utils";
+import { capitalizeFirstLetter, getLocalStorageData, setLocalStorageData } from "../utils";
 import { MODEL_URLS, MODELS } from "../constants";
 
 interface IBookProps {
@@ -10,9 +10,10 @@ interface IBookProps {
   model: string;
 }
 
-function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
+export const DropDown = ({ onDataItemSelect, model }: Readonly<IBookProps>) => {
   const axiosPrivate = useAxiosPrivate();
-  const [selectedDataItems, setSelectedDataItems] = useState<string>("Select Book");
+  const prompt = model === MODELS.document ? "Select Book" : "Select";
+  const [selectedDataItems, setSelectedDataItems] = useState<string>(prompt);
   const [dataItems, setDataItems] = useState([]);
 
   useEffect(() => {
@@ -33,6 +34,7 @@ function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
     fetchData();
   }, []);
 
+  // Todo To truly decouple this drop down, pass in the modelUrls as props
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getDataItems = async (model: string): Promise<any> => {
     let url = "";
@@ -55,7 +57,12 @@ function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
   const handleSelect = async (eventKey: string | null) => {
     if (eventKey) {
       setSelectedDataItems(eventKey);
-      const selectedItemData = dataItems.find((item: { title: string }) => item.title === eventKey);
+      let selectedItemData;
+      if (model === MODELS.document) {
+        selectedItemData = dataItems.find((item: { title: string }) => item.title === eventKey);
+      } else {
+        selectedItemData = dataItems.find((item: { name: string }) => item.name === eventKey);
+      }
       if (selectedItemData) {
         onDataItemSelect(selectedItemData);
       }
@@ -68,17 +75,21 @@ function Books({ onDataItemSelect, model }: Readonly<IBookProps>) {
           {selectedDataItems}
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          {dataItems?.map((document: { title: string; id: number }) => (
-            <Dropdown.Item eventKey={document.title} key={document.id}>
-              {document.title}
-            </Dropdown.Item>
-          ))}
+          {dataItems?.map((document: { title: string; name: string; id: number }) =>
+            model === MODELS.document ? (
+              <Dropdown.Item eventKey={document.title} key={document.id}>
+                {capitalizeFirstLetter(document.title.toLocaleUpperCase())}
+              </Dropdown.Item>
+            ) : (
+              <Dropdown.Item eventKey={document.name} key={document.id}>
+                {capitalizeFirstLetter(document.name)}
+              </Dropdown.Item>
+            )
+          )}
         </Dropdown.Menu>
       </Dropdown>
     );
   } catch (error) {
     console.error(error);
   }
-}
-
-export default Books;
+};

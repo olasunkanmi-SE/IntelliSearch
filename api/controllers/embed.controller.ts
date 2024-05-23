@@ -7,7 +7,8 @@ import multer from "multer";
 export class EmbeddingController {
   path = "/embed";
   router = express.Router();
-  upload = multer({ limits: { fileSize: 5000000 } });
+  //Todo: update the filesize limitation
+  upload = multer({ limits: { fileSize: 50000000 } });
   constructor() {
     this.initRoutes();
   }

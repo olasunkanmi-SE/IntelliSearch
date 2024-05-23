@@ -28,9 +28,10 @@ export const FileUploader: React.FC = () => {
     }
   };
 
+  //throw an error if max size is exceeded
   const options: DropzoneOptions = {
     onDrop,
-    maxSize: 5 * 1024 * 1024,
+    // maxSize: 5 * 1024 * 1024,
     maxFiles: 1,
   };
 

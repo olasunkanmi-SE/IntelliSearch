@@ -6,6 +6,9 @@
 
 IntelliSearch is an advanced retrieval-based question-answering and recommendation system that leverages embeddings and a large language model (LLM) to provide accurate and relevant information to users. With its intelligent search capabilities and future recommendation features, IntelliSearch aims to be a comprehensive solution for extracting knowledge and discovering personalized content from a vast corpus of documents.
 
+## Architecture
+<img width="1222" alt="Retrieval Augmented Generator project, intellisearch by Oyinlola Olasunkanmi Raymond" src="https://github.com/olasunkanmi-SE/Vectorized-Intelligence/assets/60177090/d1f6495d-8245-400b-ba20-a520c7200950">
+
 ## Features
 
 - Intelligent search capabilities powered by embeddings and cosine similarity
@@ -69,6 +72,4 @@ For detailed installation instructions, configuration options, and usage guideli
 
 We welcome contributions to enhance IntelliSearch and make it even more powerful. If you encounter any issues, have suggestions for improvements, or want to add new features, please open an issue or submit a pull request. Let's collaborate and make IntelliSearch the go-to solution for intelligent question answering and content recommendation!
 
-## Architecture
-<img width="1222" alt="Retrieval Augmented Generator project, intellisearch by Oyinlola Olasunkanmi Raymond" src="https://github.com/olasunkanmi-SE/Vectorized-Intelligence/assets/60177090/d1f6495d-8245-400b-ba20-a520c7200950">
 

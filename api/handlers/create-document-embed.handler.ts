@@ -13,8 +13,8 @@ export class CreateDocumentEmbeddingHandler implements IRequestHandler<ICreateEm
   async handle(request: ICreateEmbeddingRequestDTO): Promise<Result<boolean>> {
     const embeddingService: EmbeddingService = new EmbeddingService(this.apiKey, this.pdf);
     try {
-      const { title, documentType, domain } = request;
-      const result = await embeddingService.createDocumentsEmbeddings(title, documentType, domain);
+      const { title, documentTypeId, domainId } = request;
+      const result = await embeddingService.createDocumentsEmbeddings(title, documentTypeId, domainId);
       if (!result) {
         throw new HttpException(HTTP_RESPONSE_CODE.BAD_REQUEST, "An error occured, could not create embeddings");
       }

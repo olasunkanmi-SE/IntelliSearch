@@ -13,11 +13,7 @@ export interface IEmbeddingService {
   }>;
   cosineSimilarity(vecA: number[], vecB: number[]): number;
   euclideanDistance(vecA: number[], vecB: number[]): number;
-  createDocumentsEmbeddings(
-    title: string,
-    documentType: DocumentTypeEnum,
-    domain: DomainEnum
-  ): Promise<Result<boolean>>;
+  createDocumentsEmbeddings(title: string, documentType: number, domain: number): Promise<Result<boolean>>;
   getQueryMatches(
     query: string,
     matchCount: number,

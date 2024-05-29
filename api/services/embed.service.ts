@@ -19,6 +19,7 @@ import { DocumentTypeService } from "./document-type.service";
 import { DocumentService } from "./document.service";
 import { DomainService } from "./domain.service";
 import { oneLine } from "common-tags";
+import { Database } from "../repositories/database";
 
 /**The `role` parameter in the `ContentPart` object is used to specify the role of the text content in relation to the task being performed.
  * the following roles are commonly used:
@@ -154,20 +155,11 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
    * @returns {Promise<boolean>} - A promise that resolves to true if the document and embeddings are created successfully, false otherwise.
    * @throws {Error} - If the document type or domain doesn't exist, or if unable to create document embeddings.
    */
-  async createDocumentsEmbeddings(
-    title: string,
-    documentType: DocumentTypeEnum,
-    domain: DomainEnum
-  ): Promise<Result<boolean>> {
+  //Check why there are errors in this trnascation
+  //put this in a prisma transaction
+  async createDocumentsEmbeddings(title: string, documentTypeId: number, domainId: number): Promise<Result<boolean>> {
     try {
       const documentRepository: DocumentRepository = new DocumentRepository();
-      const domainService: DomainService = new DomainService();
-      const documentTypeService: DocumentTypeService = new DocumentTypeService();
-      const docType: IDocumentTypeModel | undefined = await documentTypeService.getDocumentType(documentType);
-      const documentTypeId: number = docType.id;
-
-      const docDomain: IDomainModel | undefined = await domainService.getDomain(domain);
-      const domainId: number = docDomain.id;
       const document: IDocumentModel = await documentRepository.create(title);
       let documentId: number;
 
@@ -190,6 +182,7 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
       }
     } catch (error) {
       console.error(error);
+      return Result.fail("Failed to create document embeddings", 500);
     }
   }
 
@@ -232,7 +225,6 @@ export class EmbeddingService extends GenerativeAIService implements IEmbeddingS
     const result: GenerateContentResult = await aiModel.generateContent(prompt);
     const response: EnhancedGenerateContentResponse = result.response;
     const text: string = response.text();
-    console.log(text);
     return text;
   }
 

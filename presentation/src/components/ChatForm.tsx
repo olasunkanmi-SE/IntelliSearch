@@ -5,9 +5,8 @@ import { Button, Card, Container, Form, ListGroup, Row, Stack } from "react-boot
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { IDataItem } from "../interfaces/document.interface";
 import { FileUploader } from "./DragAndDrop";
-import Books from "./DropDown";
+import { DropDown } from "./DropDown";
 import NavBar from "./NavBar";
-import Example from "./Modal";
 
 interface IHistory {
   role: string;
@@ -24,6 +23,7 @@ export function Thread() {
 
   const handleBookSelect = (bookData: IDataItem) => {
     setSelectedBook(bookData);
+    console.log(selectedBook);
   };
 
   const formAction = async () => {
@@ -86,7 +86,7 @@ export function Thread() {
             <div className="p-2"></div>
             <div className="p-2 ms-auto">
               <div>
-                <Books onDataItemSelect={handleBookSelect} model="document" />
+                <DropDown onDataItemSelect={handleBookSelect} model="document" />
               </div>
             </div>
             <div className="p-2">
@@ -180,9 +180,6 @@ export function Thread() {
           </div>
         </div>
         <div style={{ width: "18rem" }} className="col-lg-3 col-md-4 col-sm-6">
-          <div>
-            <Example />
-          </div>
           <div style={{ marginTop: "10px" }}>
             <Card style={{ backgroundColor: "#000", borderColor: "#fff", color: "#fff" }}>
               <Card.Body>

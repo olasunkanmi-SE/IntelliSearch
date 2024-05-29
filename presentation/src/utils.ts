@@ -50,3 +50,7 @@ export const getLocalStorageData = (key: string, decrypt: boolean) => {
     console.log("Error while getting user data", error);
   }
 };
+
+export const capitalizeFirstLetter = (word: string) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+};
